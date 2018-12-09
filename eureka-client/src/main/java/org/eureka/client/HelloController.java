@@ -14,6 +14,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class HelloController {
@@ -21,6 +22,7 @@ public class HelloController {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	@Autowired
 	private DiscoveryClient client;
+
 
 	@RequestMapping(value = "hello", method = RequestMethod.GET)
 	public String index() {
@@ -31,4 +33,6 @@ public class HelloController {
 //		logger.info("/hello, host:" + instance.getHost() + ", service_id:" + instance.getServiceId());
 		return "Hello World123";
 	}
+
+	
 }

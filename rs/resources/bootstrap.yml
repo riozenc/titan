@@ -1,9 +1,9 @@
 server:
-  port: 8761
+  port: 8888
 
 eureka:
   instance:
-    hostname: localhost
+    hostname: titan
   client:
     registerWithEureka: false
     fetchRegistry: false
