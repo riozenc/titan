@@ -14,7 +14,6 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 @ControllerAdvice
@@ -23,6 +22,7 @@ public class HelloController {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	@Autowired
 	private DiscoveryClient client;
+
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -46,4 +46,5 @@ public class HelloController {
 	public String eat() {
 		return "真香..";
 	}
+
 }
