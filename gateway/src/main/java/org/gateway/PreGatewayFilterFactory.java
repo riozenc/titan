@@ -6,9 +6,10 @@
 package org.gateway;
 
 import org.springframework.cloud.gateway.filter.GatewayFilter;
-import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.stereotype.Component;
+
 
 public class PreGatewayFilterFactory extends AbstractGatewayFilterFactory<PreGatewayFilterFactory.Config> {
 	public PreGatewayFilterFactory() {
@@ -18,6 +19,9 @@ public class PreGatewayFilterFactory extends AbstractGatewayFilterFactory<PreGat
 	@Override
 	public GatewayFilter apply(Config config) {
 		// grab configuration from Config object
+		
+		System.out.println("asd");
+		
 		return (exchange, chain) -> {
 			// If you want to build a "pre" filter you need to manipulate the
 			// request before calling change.filter

@@ -28,7 +28,6 @@ public class App {
 
 	public static void main(String[] args) {
 		// DiscoveryClient.java:414)
-
 		SpringApplication.run(App.class, args);
 		System.out.println("Hello World!"); 
 	}
