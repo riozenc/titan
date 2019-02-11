@@ -3,7 +3,7 @@
  *    Date:2019年1月3日 上午11:45:04
  *    Title:org.gateway.CustomFilter.java
  **/
-package org.gateway;
+package org.gateway.filter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
