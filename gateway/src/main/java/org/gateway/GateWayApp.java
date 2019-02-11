@@ -39,15 +39,8 @@ public class GateWayApp {
 	public RouteLocator routeLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		Builder builder = routeLocatorBuilder.routes();
 
-//		Builder asyncBuilder = builder.route(r -> r.path("/ab").
-//				uri("lb://SECURITY-SERVER/security/appInfo?method=filter")
-//				.filter(new PreGatewayFilter()));
-
-//		Builder asyncBuilder = builder
-//				.route(r -> r.path("/ab").filters(f -> f.filter(new PreGatewayFilter())).uri("http://httpbin.org:80"));
-
 		Builder asyncBuilder = builder
-				.route(r -> r.path("/get").uri("http://localhost:9911/SECURITY-SERVER/security/appInfo?method=filter"));
+				.route(r -> r.path("/get").uri("http://www.baidu.com"));
 
 		RouteLocator routeLocator = asyncBuilder.build();
 		return routeLocator;
