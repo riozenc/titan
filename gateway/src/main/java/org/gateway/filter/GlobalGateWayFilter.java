@@ -3,7 +3,7 @@
  *    Date:2019年1月3日 上午10:50:17
  *    Title:org.gateway.GlobalGateWayFilter.java
  **/
-package org.gateway;
+package org.gateway.filter;
 
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
