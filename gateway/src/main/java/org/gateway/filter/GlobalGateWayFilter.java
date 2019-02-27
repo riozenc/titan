@@ -6,12 +6,14 @@
 package org.gateway.filter;
 
 import java.net.URI;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ServerWebExchange;
@@ -31,8 +33,11 @@ public class GlobalGateWayFilter implements GlobalFilter, Ordered {
 
 		HttpHeaders httpHeaders = exchange.getRequest().getHeaders();
 
-//		String token = httpHeaders.getFirst("Authorization");
-		String token = "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2luZm8iOnsiaWQiOjEsInVzZXJJZCI6InN5c2FkbWluIiwidXNlck5hbWUiOiLns7vnu5_nrqHnkIblkZgiLCJwYXNzd29yZCI6bnVsbCwicGhvbmUiOm51bGwsInNleCI6bnVsbCwic3RhdHVzIjoxLCJtYWlsQWRkcmVzcyI6bnVsbCwiaW1hZ2VVcmwiOm51bGwsInJlbWFyayI6bnVsbCwiY3JlYXRlRGF0ZSI6MTU0ODIxMDg0MDAwMCwidXBkYXRlRGF0ZSI6bnVsbH0sInVzZXJfbmFtZSI6Iuezu-e7n-euoeeQhuWRmCIsInNjb3BlIjpbInVzZXIiXSwiZXhwIjoxNTUwNDQwODY2LCJhdXRob3JpdGllcyI6WyIxIl0sImp0aSI6IjcyM2UwZmU5LTM4ZWQtNGJhOS1hY2Q5LWVmODI0ODMzZDgzMSIsImNsaWVudF9pZCI6InRlc3QifQ.KuNfTb9IYuGuocz9X0tqN39ChWK9MjGZJS69B2E2kStqcWGryotyd5RvThZUwwFmplAOfjgewoq4XmHoVc3K27Y9q4dOj2mFYuOSQDONykf2BwOn_o2f9LveWcRkwdFJt1Zt1LqCus1v1CGbJQvGrErvOIarOG2N1OJzovgIfBz0LYZR0ZQvsEZjxXZIURqnmoQG49yReKW-PxfeVJT0Sm1TpJQOox38Jp9BR3IdO7l3x7PVFSDNeuzjVyQZU_alZ1UN7xOWfKxbfG-BLumQ2DkBRxm1jUBeomVuXg0SyOGMl5Jcvt7191mIHGS77QM0S1b93DFeKUaeMxjVkxwMvQ";
+		String token = httpHeaders.getFirst("Authorization");
+		
+		if(null==token) {
+			return Mono.error(new Exception("token is null!"));
+		}
 
 //		URI uri = exchange.getRequest().getURI();
 //
@@ -41,15 +46,14 @@ public class GlobalGateWayFilter implements GlobalFilter, Ordered {
 //		}
 
 		// 认证校验
-		String flag = restTemplate.getForObject("http://AUTH-CENTER/auth/extractToken?token=" + token, String.class);
-
-		System.out.println(flag);
-		return Mono.error(new Exception("没有权限哦!"));
-//		if (flag) {
-//			return chain.filter(exchange);
-//		} else {
-//			return Mono.error(new Exception("没有权限哦!"));
-//		}
+		String result = restTemplate.getForObject("http://AUTH-CENTER/auth/extractToken?token=" + token, String.class);
+		HashMap hashMap = GsonBuilderUtils.gsonBuilderWithBase64EncodedByteArrays().create().fromJson(result,
+				HashMap.class);
+//LVSHMFAC6JH429412
+		if (1000 == (double) hashMap.get("code")) {
+			return chain.filter(exchange);
+		}
+		return Mono.error(new Exception(result));
 
 	}
 

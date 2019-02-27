@@ -5,10 +5,13 @@
  **/
 package org.gateway.handler;
 
+import java.util.HashMap;
+
 import org.gateway.entity.AuthorizationEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
@@ -82,12 +85,26 @@ public class AuthorizationHandler {
 	}
 
 	@ResponseBody
-	@PostMapping(params = "method=getUser")
+	@RequestMapping(params = "method=getUser")
 	public void getUser() {
+
+		String result = restTemplate.getForObject("http://GATEWAY/auth-data/role/auth/table", String.class);
+
+		System.out.println(result);
 
 	}
 
-	public void getRoles() {
+	@ResponseBody
+	@GetMapping(params = "method=getUserRoles")
+	public String getUserRoles(String token) {
+
+		String result = restTemplate.getForObject("http://AUTH-CENTER/auth/extractToken?token=" + token, String.class);
+		HashMap hashMap = GsonBuilderUtils.gsonBuilderWithBase64EncodedByteArrays().create().fromJson(result,
+				HashMap.class);
+		if (1000 == (double) hashMap.get("code")) {
+			return result;
+		}
+		return "...";
 	}
 
 	public void getToken() {

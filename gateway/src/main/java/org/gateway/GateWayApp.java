@@ -1,9 +1,7 @@
 package org.gateway;
 
-import org.gateway.filter.AuthTokenFilter;
-import org.gateway.filter.CustomFilter;
+import org.gateway.filter.BemServerFilter;
 import org.gateway.filter.PreGatewayFilter;
-import org.gateway.handler.AuthorizationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -14,14 +12,7 @@ import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder.Builder;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-
-/**
- * Hello world!
- *
- */
 
 @EnableEurekaClient
 @SpringBootApplication
@@ -40,6 +31,12 @@ public class GateWayApp {
 		LOGGER.info("Start GateWayApp Done");
 	}
 
+	/**
+	 * 个人测试用
+	 * 
+	 * @param routeLocatorBuilder
+	 * @return
+	 */
 	@Bean
 	public RouteLocator securityRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		Builder builder = routeLocatorBuilder.routes();
@@ -51,13 +48,65 @@ public class GateWayApp {
 		return routeLocator;
 	}
 
+	/**
+	 * 认证中心
+	 * 
+	 * @param routeLocatorBuilder
+	 * @return
+	 */
 	@Bean
 	public RouteLocator authRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		Builder builder = routeLocatorBuilder.routes();
 		Builder asyncBuilder = builder.route(
 				r -> r.path("/auth/**/{seg}").filters(f -> f.filter(new PreGatewayFilter())).uri("lb://AUTH-CENTER/"));
 		// StripPrefix
+		RouteLocator routeLocator = asyncBuilder.build();
+		return routeLocator;
+	}
 
+	/**
+	 * 认证数据服务
+	 * 
+	 * @param routeLocatorBuilder
+	 * @return
+	 */
+	@Bean
+	public RouteLocator authDataRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
+		Builder builder = routeLocatorBuilder.routes();
+		Builder asyncBuilder = builder.route(r -> r.path("/auth-data/**")
+//		Builder asyncBuilder = builder.route(r -> r.path("/auth-data/**/{seg}")
+				.filters(f -> f.filter(new PreGatewayFilter())).uri("lb://AUTH-DATA/"));
+		RouteLocator routeLocator = asyncBuilder.build();
+		return routeLocator;
+	}
+
+	/**
+	 * 用户管理
+	 * 
+	 * @param routeLocatorBuilder
+	 * @return
+	 */
+	@Bean
+	public RouteLocator userManagerRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
+		Builder builder = routeLocatorBuilder.routes();
+		Builder asyncBuilder = builder.route(r -> r.path("/userServer/**/{seg}")
+				.filters(f -> f.filter(new PreGatewayFilter())).uri("lb://USER-SERVER/"));
+		RouteLocator routeLocator = asyncBuilder.build();
+
+		return routeLocator;
+	}
+
+	/**
+	 * 业扩服务
+	 * 
+	 * @param routeLocatorBuilder
+	 * @return
+	 */
+	@Bean
+	public RouteLocator bemManagerRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
+		Builder builder = routeLocatorBuilder.routes();
+		Builder asyncBuilder = builder.route(r -> r.path("/bemServer/**/{seg}")
+				.filters(f -> f.filter(new BemServerFilter())).uri("lb://BEM-SERVER/"));
 		RouteLocator routeLocator = asyncBuilder.build();
 
 		return routeLocator;
