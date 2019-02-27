@@ -3,6 +3,9 @@ server:
 eureka:
   instance:
     hostname: rs
+  server:
+    #关闭保护
+    enable-self-preservation: false
   client:
     registerWithEureka: false
     fetchRegistry: false

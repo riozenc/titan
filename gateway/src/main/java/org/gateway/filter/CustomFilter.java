@@ -7,14 +7,16 @@ package org.gateway.filter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
 import reactor.core.publisher.Mono;
 
-public class CustomFilter implements GatewayFilter, Ordered {
+
+public class CustomFilter implements GlobalFilter, Ordered {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private static final String COUNT_Start_TIME = "countStartTime";
@@ -22,7 +24,7 @@ public class CustomFilter implements GatewayFilter, Ordered {
 	@Override
 	public int getOrder() {
 		// TODO Auto-generated method stub
-		return Ordered.LOWEST_PRECEDENCE;
+		return 0;
 	}
 
 	@Override

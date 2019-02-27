@@ -1,14 +1,17 @@
 server:
- port: 9911
+ port: 9922
 spring:
  application:
-  name: gateway-service
+  name: gateway-test
  cloud:
   gateway:
    discovery:
     locator:
      enabled: true
 eureka:
+  instance: 
+    prefer-ip-address: true
+    ip-address: 172.21.29.75
   client:
     serviceUrl:
       defaultZone: http://localhost:7777/eureka/

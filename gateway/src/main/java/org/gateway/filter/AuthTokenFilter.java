@@ -7,16 +7,19 @@ package org.gateway.filter;
 
 import java.util.Map;
 
-import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
+import org.springframework.core.Ordered;
+import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.pattern.PathPattern;
 
 import reactor.core.publisher.Mono;
 
-public class AuthTokenFilter implements GatewayFilter {
+
+public class AuthTokenFilter implements GlobalFilter, Ordered {
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -31,6 +34,12 @@ public class AuthTokenFilter implements GatewayFilter {
 		Map<String, String> m2 = pp.getUriVariables();
 
 		return chain.filter(exchange);
+	}
+
+	@Override
+	public int getOrder() {
+		// TODO Auto-generated method stub
+		return -1;
 	}
 
 }
