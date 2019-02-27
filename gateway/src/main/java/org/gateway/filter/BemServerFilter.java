@@ -48,6 +48,7 @@ public class BemServerFilter implements GatewayFilter {
 
 		}
 
+		String value = null;
 		if ("POST".equals(method)) {
 
 			// 从请求里获取Post请求体
