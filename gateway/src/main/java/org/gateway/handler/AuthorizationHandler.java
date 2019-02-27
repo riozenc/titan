@@ -86,12 +86,12 @@ public class AuthorizationHandler {
 
 	@ResponseBody
 	@RequestMapping(params = "method=getUser")
-	public void getUser() {
+	public String getUser() {
 
 		String result = restTemplate.getForObject("http://GATEWAY/auth-data/role/auth/table", String.class);
 
 		System.out.println(result);
-
+		return result;
 	}
 
 	@ResponseBody

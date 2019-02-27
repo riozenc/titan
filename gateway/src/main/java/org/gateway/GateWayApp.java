@@ -1,5 +1,6 @@
 package org.gateway;
 
+import org.gateway.custom.context.SpringContextHolder;
 import org.gateway.filter.BemServerFilter;
 import org.gateway.filter.PreGatewayFilter;
 import org.slf4j.Logger;
@@ -71,12 +72,9 @@ public class GateWayApp {
 	 */
 	@Bean
 	public RouteLocator userManagerRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
-		Builder builder = routeLocatorBuilder.routes();
-		Builder asyncBuilder = builder.route(r -> r.path("/userServer/**/{seg}")
-				.filters(f -> f.filter(new PreGatewayFilter())).uri("lb://USER-SERVER/"));
-		RouteLocator routeLocator = asyncBuilder.build();
 
-		return routeLocator;
+		return routeLocatorBuilder.routes().route(r -> r.path("/userServer/**/{seg}")
+				.filters(f -> f.filter(new PreGatewayFilter())).uri("lb://USER-SERVER/")).build();
 	}
 
 	/**
@@ -87,12 +85,12 @@ public class GateWayApp {
 	 */
 	@Bean
 	public RouteLocator bemManagerRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
-		Builder builder = routeLocatorBuilder.routes();
-		Builder asyncBuilder = builder.route(r -> r.path("/bemServer/**/{seg}")
-				.filters(f -> f.filter(new BemServerFilter())).uri("lb://BEM-SERVER/"));
-		RouteLocator routeLocator = asyncBuilder.build();
+		return routeLocatorBuilder.routes()
+				.route(r -> r.path("/bemServer/**/{seg}")
+						.filters(f -> f.filter(SpringContextHolder.getBean(BemServerFilter.class)))
+						.uri("lb://BEM-SERVER/"))
+				.build();
 
-		return routeLocator;
 	}
 
 }
