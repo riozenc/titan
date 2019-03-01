@@ -97,6 +97,11 @@ public class CustomServerHttpRequest implements ServerHttpRequest.Builder {
 		return this;
 	}
 
+	public ServerHttpRequest.Builder body(Flux<DataBuffer> body) {
+		this.body = body;
+		return this;
+	}
+
 	@Override
 	public ServerHttpRequest.Builder headers(Consumer<HttpHeaders> headersConsumer) {
 		Assert.notNull(headersConsumer, "'headersConsumer' must not be null");

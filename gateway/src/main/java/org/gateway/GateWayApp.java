@@ -31,6 +31,17 @@ public class GateWayApp {
 		SpringApplication.run(GateWayApp.class, args);
 		LOGGER.info("Start GateWayApp Done");
 	}
+	
+	
+	@Bean
+	public RouteLocator testLocator(RouteLocatorBuilder routeLocatorBuilder) {
+		Builder builder = routeLocatorBuilder.routes();
+		Builder asyncBuilder = builder.route(
+				r -> r.path("/security/**").filters(f -> f.filter(SpringContextHolder.getBean(BemServerFilter.class))).uri("lb://SECURITY-SERVER/"));
+		// StripPrefix
+		RouteLocator routeLocator = asyncBuilder.build();
+		return routeLocator;
+	}
 
 	/**
 	 * 认证中心
