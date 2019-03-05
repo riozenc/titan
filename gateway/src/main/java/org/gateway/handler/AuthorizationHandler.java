@@ -30,6 +30,7 @@ import com.google.gson.JsonElement;
 @ControllerAdvice
 @RequestMapping("authorization")
 public class AuthorizationHandler {
+	private static final int SUCCESS = 200;
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -62,20 +63,21 @@ public class AuthorizationHandler {
 
 		String result = restTemplate.postForObject("http://AUTH-CENTER/auth/oauth/token", requestEntity, String.class);
 
-		System.out.println(result);
 		return result;
 	}
 
 	@ResponseBody
 	@RequestMapping(params = "method=getUser")
-	public String getUser() {
+	public String getUser() throws Exception {
 		String token = "bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2luZm8iOnsiaWQiOjEsInVzZXJJZCI6InN5c2FkbWluIiwidXNlck5hbWUiOiLns7vnu5_nrqHnkIblkZgiLCJwYXNzd29yZCI6bnVsbCwicGhvbmUiOiIxNTExMjM0NTY3OCIsInNleCI6bnVsbCwic3RhdHVzIjoxLCJtYWlsQWRkcmVzcyI6bnVsbCwiaW1hZ2VVcmwiOm51bGwsInJlbWFyayI6bnVsbCwiY3JlYXRlRGF0ZSI6MTU0ODIxMDg0MDAwMCwidXBkYXRlRGF0ZSI6MTU1MDY0NDQzNTAwMH0sInVzZXJfbmFtZSI6Iuezu-e7n-euoeeQhuWRmCIsInNjb3BlIjpbInVzZXIiXSwiZXhwIjoxNTUxMzgyNjYyLCJhdXRob3JpdGllcyI6WyIxIl0sImp0aSI6IjJiNzc2OWJiLTkyYWItNDYzMy04ZmQ5LTkwNDg4YmExZmQyMyIsImNsaWVudF9pZCI6InRlc3QifQ.CK-7n5-sbj52jv2FWoLwv8VUYAQEYq9ZLouh64C-1sCc0DSgu0futtZnffRJry7i4a6_8oQBcvhGhIbzwcadiOC5yqbR28_kN79Zq8pS8rXttIFVZs2A1RYEhZvLcCz3nF2u5gV1NWJUhDuzW62V7Rywlk-fndR04iaQBFCVnvbT1UVjlFOkq1gDRV4mUk_WIQ_IRLaULUZiv-xqDjOxyyPDMW0L3vXCp-qyN2weDQdFZZ7ohDcihy4FUMsa4ySCylGxbLQjrf3Kg83jzxk2spc0npgmSjfvVJwaxo2UJQ8H46P3oZKp0WqyP9-OCiYiQoqiXxqHbjyqGyCZh5LtsA";
 
 		String result = restTemplate.getForObject("http://AUTH-CENTER/auth/extractToken?token=" + token, String.class);
-		RestObject rest = GsonBuilderUtils.gsonBuilderWithBase64EncodedByteArrays().create().fromJson(result,
-				RestObject.class);
+		RestObject restObject = new Gson().fromJson(result, RestObject.class);
+		if (!restObject.isSuccess()) {
+			throw new Exception(new Exception(restObject.getMessage()));
+		}
 
-		UserInfo userInfo = new Gson().fromJson(rest.getData(), UserInfo.class);
+		UserInfo userInfo = new Gson().fromJson(restObject.getData(), UserInfo.class);
 
 		return userInfo.getId().toString();
 	}
@@ -91,20 +93,17 @@ public class AuthorizationHandler {
 		requestHeaders.add("Authorization", token);
 		HttpEntity<String> requestEntity = new HttpEntity<String>(null, requestHeaders);
 
-//		ResponseEntity<String> responseEntity = restTemplate.exchange("http://AUTH-DATA/auth-data/user/role/" + userId,
-//				HttpMethod.GET, requestEntity, String.class);
 		ResponseEntity<String> responseEntity = restTemplate.exchange("http://AUTH-DATA/auth-data/role/auth/table",
 				HttpMethod.GET, requestEntity, String.class);
 
-		RestObject rest = GsonBuilderUtils.gsonBuilderWithBase64EncodedByteArrays().create()
-				.fromJson(responseEntity.getBody(), RestObject.class);
+		RestObject restObject = new Gson().fromJson(responseEntity.getBody(), RestObject.class);
 
-		if (rest.getCode() != 1000) {
-			throw new Exception(new Exception(rest.getMessage()));
+		if (!restObject.isSuccess()) {
+			throw new Exception(new Exception(restObject.getMessage()));
 		}
 
 		List<String> roleIdList = new ArrayList<>();
-		rest.getData().getAsJsonArray().forEach(json -> {
+		restObject.getData().getAsJsonArray().forEach(json -> {
 			roleIdList.add(json.getAsJsonObject().get("id").getAsString());
 		});
 
@@ -121,18 +120,18 @@ public class AuthorizationHandler {
 
 	}
 
-	class RestObject {
+	public class RestObject {
 
-		private Integer code;
+		private Integer status;
 		private String message;
 		private JsonElement data;
 
-		public Integer getCode() {
-			return code;
+		public Integer getStatus() {
+			return status;
 		}
 
-		public void setCode(Integer code) {
-			this.code = code;
+		public void setStatus(Integer status) {
+			this.status = status;
 		}
 
 		public String getMessage() {
@@ -149,6 +148,10 @@ public class AuthorizationHandler {
 
 		public void setData(JsonElement data) {
 			this.data = data;
+		}
+
+		public boolean isSuccess() {
+			return this.status == SUCCESS;
 		}
 
 	}

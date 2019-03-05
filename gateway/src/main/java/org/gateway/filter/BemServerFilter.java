@@ -6,9 +6,7 @@
 package org.gateway.filter;
 
 import java.net.URI;
-import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.gateway.custom.CustomServerHttpRequest;
@@ -17,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.NettyDataBufferFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -27,6 +24,7 @@ import org.springframework.web.server.ServerWebExchange;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import io.netty.buffer.ByteBufAllocator;
 import reactor.core.publisher.Flux;
@@ -53,7 +51,7 @@ public class BemServerFilter implements GatewayFilter {
 						.addParameter(AuthorizationHandler.ROLE_IDS, roleIds);
 				customServerHttpRequest.uri(uriBuilder.build());
 			} else if (HttpMethod.POST.equals(serverHttpRequest.getMethod())) {
-				String bodyStr = resolveBodyFromRequest(serverHttpRequest);
+				String bodyStr = exchange.getAttribute("cachedRequestBodyObject");
 				String params = null;
 				if (isApplicationJsonType(serverHttpRequest)) {
 					params = tamperWithJson(bodyStr, userId, roleIds);
@@ -75,23 +73,6 @@ public class BemServerFilter implements GatewayFilter {
 	}
 
 	/**
-	 * 从Flux<DataBuffer>中获取字符串的方法
-	 * 
-	 * @return 请求体
-	 */
-	private String resolveBodyFromRequest(ServerHttpRequest serverHttpRequest) {
-		// 获取请求体
-		Flux<DataBuffer> body = serverHttpRequest.getBody();
-		AtomicReference<String> bodyRef = new AtomicReference<>();
-		body.subscribe(buffer -> {
-			CharBuffer charBuffer = StandardCharsets.UTF_8.decode(buffer.asByteBuffer());
-			DataBufferUtils.release(buffer);
-			bodyRef.set(charBuffer.toString());
-		});
-		return bodyRef.get();
-	}
-
-	/**
 	 * 组装DataBuffer
 	 * 
 	 * @param value
@@ -106,7 +87,7 @@ public class BemServerFilter implements GatewayFilter {
 		return buffer;
 	}
 
-	private String getUserId() {
+	private String getUserId() throws Exception {
 		return authorizationHandler.getUser();
 	}
 
@@ -126,9 +107,8 @@ public class BemServerFilter implements GatewayFilter {
 	}
 
 	private String tamperWithJson(String body, String userId, String roleIds) {
-		// {"type":"COMMON_PARAM"}
 		Gson gson = new Gson();
-		JsonElement jsonElement = gson.fromJson(body, JsonElement.class);
+		JsonElement jsonElement = body == null ? new JsonObject() : gson.fromJson(body, JsonElement.class);
 		if (jsonElement.isJsonObject()) {
 			jsonElement.getAsJsonObject().addProperty(AuthorizationHandler.USER_ID, userId);
 			jsonElement.getAsJsonObject().addProperty(AuthorizationHandler.ROLE_IDS, roleIds);

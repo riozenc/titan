@@ -22,8 +22,6 @@ public class PreGatewayFilter implements GatewayFilter {
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 		// TODO Auto-generated method stub
 
-		System.out.println("PreGatewayFilter === filter");
-
 		PathPattern.PathMatchInfo pp = exchange.getAttribute(ServerWebExchangeUtils.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
 		Map<String, MultiValueMap<String, String>> m1 = pp.getMatrixVariables();
