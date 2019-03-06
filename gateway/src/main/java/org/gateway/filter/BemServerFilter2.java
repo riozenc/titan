@@ -11,6 +11,7 @@ import org.gateway.handler.AuthorizationHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.factory.rewrite.ModifyRequestBodyGatewayFilterFactory;
 import org.springframework.cloud.gateway.support.BodyInserterContext;
 import org.springframework.cloud.gateway.support.CachedBodyOutputMessage;
 import org.springframework.cloud.gateway.support.DefaultServerRequest;
@@ -20,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ReactiveHttpOutputMessage;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -31,7 +33,7 @@ import com.google.gson.JsonObject;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
+@Component
 public class BemServerFilter2 implements GatewayFilter {
 	@Autowired
 	private AuthorizationHandler authorizationHandler;
@@ -69,8 +71,8 @@ public class BemServerFilter2 implements GatewayFilter {
 			// and then set in the request decorator
 			headers.remove(HttpHeaders.CONTENT_LENGTH);
 			CachedBodyOutputMessage outputMessage = new CachedBodyOutputMessage(exchange, headers);
-
-			return bodyInserter.insert(outputMessage, new BodyInserterContext()).log("modify_request", Level.INFO)
+			
+			return bodyInserter.insert(outputMessage, new BodyInserterContext())
 					.then(Mono.defer(() -> {
 						ServerHttpRequestDecorator decorator = new ServerHttpRequestDecorator(exchange.getRequest()) {
 							@Override
@@ -103,11 +105,13 @@ public class BemServerFilter2 implements GatewayFilter {
 	}
 
 	private String getUserId() throws Exception {
-		return authorizationHandler.getUser();
+//		return authorizationHandler.getUser();
+		return "1";
 	}
 
 	private String getRoleId(String userId) throws Exception {
-		return authorizationHandler.getRoles(userId);
+//		return authorizationHandler.getRoles(userId);
+		return "1,2";
 	}
 
 	private boolean isApplicationJsonType(ServerHttpRequest serverHttpRequest) {

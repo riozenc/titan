@@ -21,7 +21,7 @@ import com.google.gson.Gson;
 
 import reactor.core.publisher.Mono;
 
-@Component
+//@Component
 public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 
 	@Autowired
