@@ -14,7 +14,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.ObjectUtils;
@@ -30,13 +29,15 @@ import com.google.gson.JsonElement;
 @ControllerAdvice
 @RequestMapping("authorization")
 public class AuthorizationHandler {
+
 	private static final int SUCCESS = 200;
+	public final static String USER_ID = "userId";
+	public final static String ROLE_IDS = "roleIds";
+	public final static String HEARDS_TOKEN = "Authorization";
+	private static final String LOGIN_TOKEN = "Basic dGVzdDp0ZXN0";
 
 	@Autowired
 	private RestTemplate restTemplate;
-
-	public final static String USER_ID = "userId";
-	public final static String ROLE_IDS = "roleIds";
 
 	@ResponseBody
 	@RequestMapping(params = "method=login")
@@ -50,7 +51,7 @@ public class AuthorizationHandler {
 		}
 
 		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.add("Authorization", "Basic dGVzdDp0ZXN0");
+		httpHeaders.add(HEARDS_TOKEN, LOGIN_TOKEN);
 
 		// body
 		MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
@@ -68,8 +69,8 @@ public class AuthorizationHandler {
 
 	@ResponseBody
 	@RequestMapping(params = "method=getUser")
-	public String getUser() throws Exception {
-		String token = "bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2luZm8iOnsiaWQiOjEsInVzZXJJZCI6InN5c2FkbWluIiwidXNlck5hbWUiOiLns7vnu5_nrqHnkIblkZgiLCJwYXNzd29yZCI6bnVsbCwicGhvbmUiOiIxNTExMjM0NTY3OCIsInNleCI6bnVsbCwic3RhdHVzIjoxLCJtYWlsQWRkcmVzcyI6bnVsbCwiaW1hZ2VVcmwiOm51bGwsInJlbWFyayI6bnVsbCwiY3JlYXRlRGF0ZSI6MTU0ODIxMDg0MDAwMCwidXBkYXRlRGF0ZSI6MTU1MDY0NDQzNTAwMH0sInVzZXJfbmFtZSI6Iuezu-e7n-euoeeQhuWRmCIsInNjb3BlIjpbInVzZXIiXSwiZXhwIjoxNTUxMzgyNjYyLCJhdXRob3JpdGllcyI6WyIxIl0sImp0aSI6IjJiNzc2OWJiLTkyYWItNDYzMy04ZmQ5LTkwNDg4YmExZmQyMyIsImNsaWVudF9pZCI6InRlc3QifQ.CK-7n5-sbj52jv2FWoLwv8VUYAQEYq9ZLouh64C-1sCc0DSgu0futtZnffRJry7i4a6_8oQBcvhGhIbzwcadiOC5yqbR28_kN79Zq8pS8rXttIFVZs2A1RYEhZvLcCz3nF2u5gV1NWJUhDuzW62V7Rywlk-fndR04iaQBFCVnvbT1UVjlFOkq1gDRV4mUk_WIQ_IRLaULUZiv-xqDjOxyyPDMW0L3vXCp-qyN2weDQdFZZ7ohDcihy4FUMsa4ySCylGxbLQjrf3Kg83jzxk2spc0npgmSjfvVJwaxo2UJQ8H46P3oZKp0WqyP9-OCiYiQoqiXxqHbjyqGyCZh5LtsA";
+	public String getUser(String token) throws Exception {
+//		String token = "bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2luZm8iOnsiaWQiOjEsInVzZXJJZCI6InN5c2FkbWluIiwidXNlck5hbWUiOiLns7vnu5_nrqHnkIblkZgiLCJwYXNzd29yZCI6bnVsbCwicGhvbmUiOiIxNTExMjM0NTY3OCIsInNleCI6bnVsbCwic3RhdHVzIjoxLCJtYWlsQWRkcmVzcyI6bnVsbCwiaW1hZ2VVcmwiOm51bGwsInJlbWFyayI6bnVsbCwiY3JlYXRlRGF0ZSI6MTU0ODIxMDg0MDAwMCwidXBkYXRlRGF0ZSI6MTU1MDY0NDQzNTAwMH0sInVzZXJfbmFtZSI6Iuezu-e7n-euoeeQhuWRmCIsInNjb3BlIjpbInVzZXIiXSwiZXhwIjoxNTUxMzgyNjYyLCJhdXRob3JpdGllcyI6WyIxIl0sImp0aSI6IjJiNzc2OWJiLTkyYWItNDYzMy04ZmQ5LTkwNDg4YmExZmQyMyIsImNsaWVudF9pZCI6InRlc3QifQ.CK-7n5-sbj52jv2FWoLwv8VUYAQEYq9ZLouh64C-1sCc0DSgu0futtZnffRJry7i4a6_8oQBcvhGhIbzwcadiOC5yqbR28_kN79Zq8pS8rXttIFVZs2A1RYEhZvLcCz3nF2u5gV1NWJUhDuzW62V7Rywlk-fndR04iaQBFCVnvbT1UVjlFOkq1gDRV4mUk_WIQ_IRLaULUZiv-xqDjOxyyPDMW0L3vXCp-qyN2weDQdFZZ7ohDcihy4FUMsa4ySCylGxbLQjrf3Kg83jzxk2spc0npgmSjfvVJwaxo2UJQ8H46P3oZKp0WqyP9-OCiYiQoqiXxqHbjyqGyCZh5LtsA";
 
 		String result = restTemplate.getForObject("http://AUTH-CENTER/auth/extractToken?token=" + token, String.class);
 		RestObject restObject = new Gson().fromJson(result, RestObject.class);
@@ -84,13 +85,13 @@ public class AuthorizationHandler {
 
 	@ResponseBody
 	@GetMapping(params = "method=getRoles")
-	public String getRoles(String userId) throws Exception {
+	public String getRoles(String token) throws Exception {
 // 
 
-		String token = "bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2luZm8iOnsiaWQiOjEsInVzZXJJZCI6InN5c2FkbWluIiwidXNlck5hbWUiOiLns7vnu5_nrqHnkIblkZgiLCJwYXNzd29yZCI6bnVsbCwicGhvbmUiOiIxNTExMjM0NTY3OCIsInNleCI6bnVsbCwic3RhdHVzIjoxLCJtYWlsQWRkcmVzcyI6bnVsbCwiaW1hZ2VVcmwiOm51bGwsInJlbWFyayI6bnVsbCwiY3JlYXRlRGF0ZSI6MTU0ODIxMDg0MDAwMCwidXBkYXRlRGF0ZSI6MTU1MDY0NDQzNTAwMH0sInVzZXJfbmFtZSI6Iuezu-e7n-euoeeQhuWRmCIsInNjb3BlIjpbInVzZXIiXSwiZXhwIjoxNTUxMzgyNjYyLCJhdXRob3JpdGllcyI6WyIxIl0sImp0aSI6IjJiNzc2OWJiLTkyYWItNDYzMy04ZmQ5LTkwNDg4YmExZmQyMyIsImNsaWVudF9pZCI6InRlc3QifQ.CK-7n5-sbj52jv2FWoLwv8VUYAQEYq9ZLouh64C-1sCc0DSgu0futtZnffRJry7i4a6_8oQBcvhGhIbzwcadiOC5yqbR28_kN79Zq8pS8rXttIFVZs2A1RYEhZvLcCz3nF2u5gV1NWJUhDuzW62V7Rywlk-fndR04iaQBFCVnvbT1UVjlFOkq1gDRV4mUk_WIQ_IRLaULUZiv-xqDjOxyyPDMW0L3vXCp-qyN2weDQdFZZ7ohDcihy4FUMsa4ySCylGxbLQjrf3Kg83jzxk2spc0npgmSjfvVJwaxo2UJQ8H46P3oZKp0WqyP9-OCiYiQoqiXxqHbjyqGyCZh5LtsA";
+//		String token = "bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2luZm8iOnsiaWQiOjEsInVzZXJJZCI6InN5c2FkbWluIiwidXNlck5hbWUiOiLns7vnu5_nrqHnkIblkZgiLCJwYXNzd29yZCI6bnVsbCwicGhvbmUiOiIxNTExMjM0NTY3OCIsInNleCI6bnVsbCwic3RhdHVzIjoxLCJtYWlsQWRkcmVzcyI6bnVsbCwiaW1hZ2VVcmwiOm51bGwsInJlbWFyayI6bnVsbCwiY3JlYXRlRGF0ZSI6MTU0ODIxMDg0MDAwMCwidXBkYXRlRGF0ZSI6MTU1MDY0NDQzNTAwMH0sInVzZXJfbmFtZSI6Iuezu-e7n-euoeeQhuWRmCIsInNjb3BlIjpbInVzZXIiXSwiZXhwIjoxNTUxMzgyNjYyLCJhdXRob3JpdGllcyI6WyIxIl0sImp0aSI6IjJiNzc2OWJiLTkyYWItNDYzMy04ZmQ5LTkwNDg4YmExZmQyMyIsImNsaWVudF9pZCI6InRlc3QifQ.CK-7n5-sbj52jv2FWoLwv8VUYAQEYq9ZLouh64C-1sCc0DSgu0futtZnffRJry7i4a6_8oQBcvhGhIbzwcadiOC5yqbR28_kN79Zq8pS8rXttIFVZs2A1RYEhZvLcCz3nF2u5gV1NWJUhDuzW62V7Rywlk-fndR04iaQBFCVnvbT1UVjlFOkq1gDRV4mUk_WIQ_IRLaULUZiv-xqDjOxyyPDMW0L3vXCp-qyN2weDQdFZZ7ohDcihy4FUMsa4ySCylGxbLQjrf3Kg83jzxk2spc0npgmSjfvVJwaxo2UJQ8H46P3oZKp0WqyP9-OCiYiQoqiXxqHbjyqGyCZh5LtsA";
 
 		HttpHeaders requestHeaders = new HttpHeaders();
-		requestHeaders.add("Authorization", token);
+		requestHeaders.add(HEARDS_TOKEN, token);
 		HttpEntity<String> requestEntity = new HttpEntity<String>(null, requestHeaders);
 
 		ResponseEntity<String> responseEntity = restTemplate.exchange("http://AUTH-DATA/auth-data/role/auth/table",
@@ -107,9 +108,7 @@ public class AuthorizationHandler {
 			roleIdList.add(json.getAsJsonObject().get("id").getAsString());
 		});
 
-		String ids = String.join(",", roleIdList);
-
-		return ids;
+		return String.join(",", roleIdList);
 
 	}
 

@@ -7,13 +7,13 @@ package org.gateway.filter;
 
 import java.net.URI;
 
+import org.gateway.handler.AuthorizationHandler;
 import org.gateway.handler.AuthorizationHandler.RestObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ServerWebExchange;
 
@@ -33,7 +33,7 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 
 		HttpHeaders httpHeaders = exchange.getRequest().getHeaders();
 
-		String token = httpHeaders.getFirst("Authorization");
+		String token = httpHeaders.getFirst(AuthorizationHandler.HEARDS_TOKEN);
 
 		if (null == token) {
 			return Mono.error(new Exception("token is null!"));

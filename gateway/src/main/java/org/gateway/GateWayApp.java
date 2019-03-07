@@ -1,7 +1,7 @@
 package org.gateway;
 
 import org.gateway.custom.context.SpringContextHolder;
-import org.gateway.filter.BemServerFilter4;
+import org.gateway.filter.BemServerFilter;
 import org.gateway.filter.PreGatewayFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +36,8 @@ public class GateWayApp {
 	public RouteLocator testLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		Builder builder = routeLocatorBuilder.routes();
 
-		Builder asyncBuilder = builder.route(
-				r -> r.path("/security/**").filters(f -> f.filter(SpringContextHolder.getBean(BemServerFilter4.class)))
-						.uri("lb://SECURITY-SERVER/"));
+		Builder asyncBuilder = builder.route(r -> r.path("/security/**").filters(f -> f.filter(new PreGatewayFilter()))
+				.uri("lb://SECURITY-SERVER/"));
 
 		RouteLocator routeLocator = asyncBuilder.build();
 		return routeLocator;
@@ -69,9 +68,8 @@ public class GateWayApp {
 	@Bean
 	public RouteLocator authDataRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		Builder builder = routeLocatorBuilder.routes();
-		Builder asyncBuilder = builder.route(r -> r.path("/auth-data/**")
-//		Builder asyncBuilder = builder.route(r -> r.path("/auth-data/**/{seg}")
-				.filters(f -> f.filter(new PreGatewayFilter())).uri("lb://AUTH-DATA/"));
+		Builder asyncBuilder = builder.route(
+				r -> r.path("/auth-data/**").filters(f -> f.filter(new PreGatewayFilter())).uri("lb://AUTH-DATA/"));
 		RouteLocator routeLocator = asyncBuilder.build();
 		return routeLocator;
 	}
@@ -99,7 +97,7 @@ public class GateWayApp {
 	public RouteLocator bemManagerRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		return routeLocatorBuilder.routes()
 				.route(r -> r.path("/bemServer/**")
-						.filters(f -> f.filter(SpringContextHolder.getBean(BemServerFilter4.class)))
+						.filters(f -> f.filter(SpringContextHolder.getBean(BemServerFilter.class)))
 						.uri("lb://BEM-SERVER/"))
 				.build();
 

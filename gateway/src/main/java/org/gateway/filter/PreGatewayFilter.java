@@ -5,6 +5,7 @@
  **/
 package org.gateway.filter;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -14,6 +15,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.util.pattern.PathPattern;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import reactor.core.publisher.Mono;
 
 public class PreGatewayFilter implements GatewayFilter {
@@ -22,15 +24,10 @@ public class PreGatewayFilter implements GatewayFilter {
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 		// TODO Auto-generated method stub
 
-		PathPattern.PathMatchInfo pp = exchange.getAttribute(ServerWebExchangeUtils.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+//		Collections.unmodifiableMap
+		Map<String, String> map = exchange.getAttribute(ServerWebExchangeUtils.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
-		Map<String, MultiValueMap<String, String>> m1 = pp.getMatrixVariables();
-		Map<String, String> m2 = pp.getUriVariables();
-//		Map<String, String> uriVariables = ServerWebExchangeUtils.getPathPredicateVariables(exchange);
-//
-//		String segment = uriVariables.get("segment");
-//
-//		System.out.println(segment);
+//		System.out.println(map.get("seg"));
 
 		return chain.filter(exchange);
 	}

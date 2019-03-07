@@ -1,101 +1,109 @@
 /**
  *    Auth:riozenc
- *    Date:2019年2月27日 下午2:51:26
+ *    Date:2019年3月5日 下午3:47:32
  *    Title:org.gateway.filter.BemServerFilter.java
  **/
 package org.gateway.filter;
 
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-
-import org.gateway.custom.reactive.CustomServerHttpRequest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.gateway.handler.AuthorizationHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.support.BodyInserterContext;
+import org.springframework.cloud.gateway.support.CachedBodyOutputMessage;
+import org.springframework.cloud.gateway.support.DefaultServerRequest;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.NettyDataBufferFactory;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ReactiveHttpOutputMessage;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.BodyInserter;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import io.netty.buffer.ByteBufAllocator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
 public class BemServerFilter implements GatewayFilter {
-
+	private static final Log log = LogFactory.getLog(BemServerFilter.class);
 	@Autowired
 	private AuthorizationHandler authorizationHandler;
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-		// TODO Auto-generated method stub
-		ServerHttpRequest serverHttpRequest = exchange.getRequest();
-		CustomServerHttpRequest customServerHttpRequest = new CustomServerHttpRequest(serverHttpRequest);
-
+		String token = exchange.getRequest().getHeaders().getFirst(AuthorizationHandler.HEARDS_TOKEN);
+		ServerRequest serverRequest = new DefaultServerRequest(exchange);
 		try {
-			String userId = getUserId();
-			String roleIds = getRoleId(userId);
-			if (HttpMethod.GET.equals(serverHttpRequest.getMethod())) {
-				URI uri = serverHttpRequest.getURI();
+			String userId = getUserId(token);
+			String roleIds = getRoleId(token);
+			// TODO: flux or mono
+			Mono<String> modifiedBody = serverRequest.bodyToMono(String.class)
+					// .log("modify_request_mono", Level.INFO)
+					.flatMap(body -> {
+						String params = null;
+						if (isApplicationJsonType(exchange.getRequest())) {
+							params = tamperWithJson(body, userId, roleIds);
+						} else {
+							params = tamperWithForm(body, userId, roleIds);
+						}
+						return Mono.just(params);
+					}).defaultIfEmpty(tamperWithJson(null, userId, roleIds));
 
-				uri = UriComponentsBuilder.fromUri(uri).queryParam(AuthorizationHandler.USER_ID, userId)
-						.queryParam(AuthorizationHandler.ROLE_IDS, roleIds).build().toUri();
-				customServerHttpRequest.uri(uri);
-			} else if (HttpMethod.POST.equals(serverHttpRequest.getMethod())) {
-				String bodyStr = exchange.getAttribute("cachedRequestBodyObject");
-				String params = null;
-				if (isApplicationJsonType(serverHttpRequest)) {
-					params = tamperWithJson(bodyStr, userId, roleIds);
-				} else {
-					params = tamperWithForm(bodyStr, userId, roleIds);
-				}
+			BodyInserter<Mono<String>, ReactiveHttpOutputMessage> bodyInserter = BodyInserters
+					.fromPublisher(modifiedBody, String.class);
+			HttpHeaders headers = new HttpHeaders();
+			headers.putAll(exchange.getRequest().getHeaders());
+			headers.remove(HttpHeaders.CONTENT_LENGTH);
+			CachedBodyOutputMessage outputMessage = new CachedBodyOutputMessage(exchange, headers);
+			return bodyInserter.insert(outputMessage, new BodyInserterContext())
+					// .log("modify_request", Level.INFO)
+					.then(Mono.defer(() -> {
+						ServerHttpRequestDecorator decorator = new ServerHttpRequestDecorator(exchange.getRequest()) {
+							@Override
+							public HttpHeaders getHeaders() {
+								long contentLength = headers.getContentLength();
+								HttpHeaders httpHeaders = new HttpHeaders();
+								httpHeaders.putAll(super.getHeaders());
+								if (contentLength > 0) {
+									httpHeaders.setContentLength(contentLength);
+								} else {
+									// TODO: this causes a 'HTTP/1.1 411 Length Required' on httpbin.org
+									httpHeaders.set(HttpHeaders.TRANSFER_ENCODING, "chunked");
+								}
+								return httpHeaders;
+							}
 
-				DataBuffer bodyDataBuffer = stringBuffer(params);
-				Flux<DataBuffer> bodyFlux = Flux.just(bodyDataBuffer);
-				customServerHttpRequest.header("Content-Length", String.valueOf(bodyDataBuffer.capacity()));
-				customServerHttpRequest.body(bodyFlux);
-			}
-			return chain.filter(exchange.mutate().request(customServerHttpRequest.build()).build());
+							@Override
+							public Flux<DataBuffer> getBody() {
+								return outputMessage.getBody();
+							}
+						};
+						return chain.filter(exchange.mutate().request(decorator).build());
+					}));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
+			log.error(e);
 			return Mono.error(e);
 		}
 
 	}
 
-	/**
-	 * 组装DataBuffer
-	 * 
-	 * @param value
-	 * @return
-	 */
-	private DataBuffer stringBuffer(String value) {
-		byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
-
-		NettyDataBufferFactory nettyDataBufferFactory = new NettyDataBufferFactory(ByteBufAllocator.DEFAULT);
-		DataBuffer buffer = nettyDataBufferFactory.allocateBuffer(bytes.length);
-		buffer.write(bytes);
-		return buffer;
+	private String getUserId(String token) throws Exception {
+		return authorizationHandler.getUser(token);
 	}
 
-	private String getUserId() throws Exception {
-//		return authorizationHandler.getUser();
-		return "1";
-	}
-
-	private String getRoleId(String userId) throws Exception {
-//		return authorizationHandler.getRoles(userId);
-		return "1,2";
+	private String getRoleId(String token) throws Exception {
+		return authorizationHandler.getRoles(token);
 	}
 
 	private boolean isApplicationJsonType(ServerHttpRequest serverHttpRequest) {
