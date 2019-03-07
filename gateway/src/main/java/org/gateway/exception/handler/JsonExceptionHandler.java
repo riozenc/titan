@@ -32,11 +32,12 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 /**
- *  自定义->异常处理->统一返回json
+ * 自定义->异常处理->统一返回json
  * 
- * @author riozenc
+ * @author riozenc1
  *
  */
+
 public class JsonExceptionHandler extends DefaultErrorWebExceptionHandler {
 	private static final Log logger = LogFactory.getLog(JsonExceptionHandler.class);
 
@@ -48,7 +49,8 @@ public class JsonExceptionHandler extends DefaultErrorWebExceptionHandler {
 
 	@Override
 	protected RouterFunction<ServerResponse> getRoutingFunction(ErrorAttributes errorAttributes) {
-		return route(acceptsTextHtml(), this::renderErrorView).andRoute(all(), this::renderErrorResponse);
+//		return route(acceptsTextHtml(), this::renderErrorView).andRoute(all(), this::renderErrorResponse);
+		return route(all(), this::renderErrorResponse);
 	}
 
 	/**

@@ -5,25 +5,138 @@
  **/
 package org.gateway;
 
-import java.util.HashMap;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+
+import reactor.core.publisher.Flux;
 
 public class Asd {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws URISyntaxException {
+		List<String> list = new ArrayList<>();
+		list.add("a");
+		list.add("b");
+		list.add("c");
 
-		String s = "{\"code\":1000,\"message\":\"success.\",\"data\":{\"id\":1,\"userId\":\"sysadmin\",\"userName\":\"系统管理员\",\"password\":null,\"phone\":null,\"sex\":null,\"status\":1,\"mailAddress\":null,\"imageUrl\":null,\"remark\":null,\"createDate\":1548210840000,\"updateDate\":null}}";
+		Flux.fromIterable(list).flatMap(body -> {
+			System.out.println(body.getBytes().length);
+			return null;
+		}).then();
 
-		Gson gson = new Gson();
-
-		HashMap<String, Object> map = gson.fromJson(s, HashMap.class);
-
-		System.out.println(map.get("code"));
-		
-		System.out.println(map.get("code").getClass().getTypeName());
-		
-		if (1000 == (double) map.get("code")) {
-			System.out.println(true);
-		}
 	}
+}
+
+class RestObject {
+
+	private Integer code;
+	private String message;
+	private JsonElement data;
+
+	public Integer getCode() {
+		return code;
+	}
+
+	public void setCode(Integer code) {
+		this.code = code;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public JsonElement getData() {
+		return data;
+	}
+
+	public void setData(JsonElement data) {
+		this.data = data;
+	}
+
+}
+
+class UserInfo {
+
+	private Long id;
+	private String userId;
+	private String userName;
+	private String phone;
+	private Byte sex;
+	private Byte status;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public Byte getSex() {
+		return sex;
+	}
+
+	public void setSex(Byte sex) {
+		this.sex = sex;
+	}
+
+	public Byte getStatus() {
+		return status;
+	}
+
+	public void setStatus(Byte status) {
+		this.status = status;
+	}
+
+}
+
+class UserRoleRel {
+	private String userId;
+	private String roleId;
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getRoleId() {
+		return roleId;
+	}
+
+	public void setRoleId(String roleId) {
+		this.roleId = roleId;
+	}
+
 }

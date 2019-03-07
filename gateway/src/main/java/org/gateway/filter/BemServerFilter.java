@@ -8,8 +8,7 @@ package org.gateway.filter;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.http.client.utils.URIBuilder;
-import org.gateway.custom.CustomServerHttpRequest;
+import org.gateway.custom.reactive.CustomServerHttpRequest;
 import org.gateway.handler.AuthorizationHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -21,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -47,9 +47,10 @@ public class BemServerFilter implements GatewayFilter {
 			String roleIds = getRoleId(userId);
 			if (HttpMethod.GET.equals(serverHttpRequest.getMethod())) {
 				URI uri = serverHttpRequest.getURI();
-				URIBuilder uriBuilder = new URIBuilder(uri).addParameter(AuthorizationHandler.USER_ID, userId)
-						.addParameter(AuthorizationHandler.ROLE_IDS, roleIds);
-				customServerHttpRequest.uri(uriBuilder.build());
+
+				uri = UriComponentsBuilder.fromUri(uri).queryParam(AuthorizationHandler.USER_ID, userId)
+						.queryParam(AuthorizationHandler.ROLE_IDS, roleIds).build().toUri();
+				customServerHttpRequest.uri(uri);
 			} else if (HttpMethod.POST.equals(serverHttpRequest.getMethod())) {
 				String bodyStr = exchange.getAttribute("cachedRequestBodyObject");
 				String params = null;
@@ -88,11 +89,13 @@ public class BemServerFilter implements GatewayFilter {
 	}
 
 	private String getUserId() throws Exception {
-		return authorizationHandler.getUser();
+//		return authorizationHandler.getUser();
+		return "1";
 	}
 
 	private String getRoleId(String userId) throws Exception {
-		return authorizationHandler.getRoles(userId);
+//		return authorizationHandler.getRoles(userId);
+		return "1,2";
 	}
 
 	private boolean isApplicationJsonType(ServerHttpRequest serverHttpRequest) {

@@ -1,7 +1,6 @@
 package org.gateway;
 
 import org.gateway.custom.context.SpringContextHolder;
-import org.gateway.filter.BemServerFilter2;
 import org.gateway.filter.BemServerFilter4;
 import org.gateway.filter.PreGatewayFilter;
 import org.slf4j.Logger;
@@ -103,13 +102,6 @@ public class GateWayApp {
 						.filters(f -> f.filter(SpringContextHolder.getBean(BemServerFilter4.class)))
 						.uri("lb://BEM-SERVER/"))
 				.build();
-
-//		return routeLocatorBuilder.routes().route(r -> r.readBody(String.class, requestBody -> {
-//			System.out.println(requestBody);
-//			// 这里不对body做判断处理
-//			return true;
-//		}).and().path("/bemServer/**").filters(f -> f.filter(SpringContextHolder.getBean(BemServerFilter.class)))
-//				.uri("lb://BEM-SERVER/")).build();
 
 	}
 
