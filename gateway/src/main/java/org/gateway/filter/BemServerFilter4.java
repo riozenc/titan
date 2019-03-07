@@ -5,31 +5,25 @@
  **/
 package org.gateway.filter;
 
+import java.net.URI;
+import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.logging.Level;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.gateway.custom.CustomServerHttpRequest;
 import org.gateway.handler.AuthorizationHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.cloud.gateway.support.BodyInserterContext;
-import org.springframework.cloud.gateway.support.CachedBodyOutputMessage;
-import org.springframework.cloud.gateway.support.DefaultServerRequest;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DefaultDataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.NettyDataBufferFactory;
-import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ReactiveHttpOutputMessage;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.BodyInserter;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.server.ServerWebExchange;
 
 import com.google.gson.Gson;
@@ -41,63 +35,77 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
-public class BemServerFilter2 implements GatewayFilter, Ordered {
+public class BemServerFilter4 implements GatewayFilter,Ordered {
+
 	@Autowired
 	private AuthorizationHandler authorizationHandler;
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-		CustomServerHttpRequest customServerHttpRequest = new CustomServerHttpRequest(exchange.getRequest());
+		// TODO Auto-generated method stub
+		ServerHttpRequest serverHttpRequest = exchange.getRequest();
+		CustomServerHttpRequest customServerHttpRequest = new CustomServerHttpRequest(serverHttpRequest);
 
 		try {
-			ServerRequest serverRequest = new DefaultServerRequest(exchange);
 			String userId = getUserId();
 			String roleIds = getRoleId(userId);
-			int length = userId.length() + roleIds.length() + 2;
-			// TODO: flux or mono
-
-//			Flux<String> modifiedBody = serverRequest.bodyToFlux(String.class).flatMap(body -> {
-//
-//				if (isApplicationJsonType(exchange.getRequest())) {
-//					body = tamperWithJson(body, userId, roleIds);
-//				} else {
-//					body = tamperWithForm(body, userId, roleIds);
-//				}
-//				
-//				DataBuffer bodyDataBuffer = stringBuffer(body);
-//				Flux<DataBuffer> bodyFlux = Flux.just(bodyDataBuffer);
-//				return Flux.just(body);
-//			});
-
-			Mono<String> modifiedBody = serverRequest.bodyToMono(String.class).flatMap(body -> {
-
-				if (isApplicationJsonType(exchange.getRequest())) {
-					body = tamperWithJson(body, userId, roleIds);
+			if (HttpMethod.GET.equals(serverHttpRequest.getMethod())) {
+				URI uri = serverHttpRequest.getURI();
+				URIBuilder uriBuilder = new URIBuilder(uri).addParameter(AuthorizationHandler.USER_ID, userId)
+						.addParameter(AuthorizationHandler.ROLE_IDS, roleIds);
+				customServerHttpRequest.uri(uriBuilder.build());
+			} else if (HttpMethod.POST.equals(serverHttpRequest.getMethod())) {
+				String bodyStr = resolveBodyFromRequest(serverHttpRequest);
+				String params = null;
+				if (isApplicationJsonType(serverHttpRequest)) {
+					params = tamperWithJson(bodyStr, userId, roleIds);
 				} else {
-					body = tamperWithForm(body, userId, roleIds);
+					params = tamperWithForm(bodyStr, userId, roleIds);
 				}
 
-				return Mono.just(body);
-			});
-			StringBuilder stringBuilder = new StringBuilder();
-			modifiedBody.subscribe(value -> {
-				stringBuilder.append(value);
-			});
-
-			DataBuffer bodyDataBuffer = stringBuffer(stringBuilder.toString());
-			Flux<DataBuffer> bodyFlux = Flux.just(bodyDataBuffer);
-
-			customServerHttpRequest.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
-			customServerHttpRequest.header("Content-Length",
-					String.valueOf(exchange.getRequest().getHeaders().getContentLength() + length));
-			customServerHttpRequest.body(bodyFlux);
+				DataBuffer bodyDataBuffer = stringBuffer(params);
+				Flux<DataBuffer> bodyFlux = Flux.just(bodyDataBuffer);
+				customServerHttpRequest.header("Content-Length", String.valueOf(bodyDataBuffer.capacity()));
+				customServerHttpRequest.body(bodyFlux);
+			}
 			return chain.filter(exchange.mutate().request(customServerHttpRequest.build()).build());
-
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			return Mono.error(e);
 		}
 
+	}
+
+	/**
+	 * 从Flux<DataBuffer>中获取字符串的方法
+	 * 
+	 * @return 请求体
+	 */
+	private String resolveBodyFromRequest(ServerHttpRequest serverHttpRequest) {
+		// 获取请求体
+		Flux<DataBuffer> body = serverHttpRequest.getBody();
+		AtomicReference<String> bodyRef = new AtomicReference<>();
+		body.subscribe(buffer -> {
+			CharBuffer charBuffer = StandardCharsets.UTF_8.decode(buffer.asByteBuffer());
+			DataBufferUtils.release(buffer);
+			bodyRef.set(charBuffer.toString());
+		});
+		return bodyRef.get();
+	}
+
+	/**
+	 * 组装DataBuffer
+	 * 
+	 * @param value
+	 * @return
+	 */
+	private DataBuffer stringBuffer(String value) {
+		byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
+
+		NettyDataBufferFactory nettyDataBufferFactory = new NettyDataBufferFactory(ByteBufAllocator.DEFAULT);
+		DataBuffer buffer = nettyDataBufferFactory.allocateBuffer(bytes.length);
+		buffer.write(bytes);
+		return buffer;
 	}
 
 	private String getUserId() throws Exception {
@@ -135,18 +143,10 @@ public class BemServerFilter2 implements GatewayFilter, Ordered {
 				.toString();
 	}
 
-	private DataBuffer stringBuffer(String value) {
-		byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
-
-		NettyDataBufferFactory nettyDataBufferFactory = new NettyDataBufferFactory(ByteBufAllocator.DEFAULT);
-		DataBuffer buffer = nettyDataBufferFactory.allocateBuffer(bytes.length);
-		buffer.write(bytes);
-		return buffer;
-	}
-
 	@Override
 	public int getOrder() {
 		// TODO Auto-generated method stub
 		return HIGHEST_PRECEDENCE;
 	}
+
 }

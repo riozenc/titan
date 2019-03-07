@@ -3,7 +3,7 @@
  *    Date:2019年2月15日 上午11:25:47
  *    Title:org.gateway.config.CorsConfig.java
  **/
-package org.gateway.config;
+package org.gateway.custom.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

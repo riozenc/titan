@@ -34,7 +34,7 @@ import org.springframework.web.reactive.result.view.ViewResolver;
 @ConditionalOnClass(WebFluxConfigurer.class)
 @AutoConfigureBefore(ErrorWebFluxAutoConfiguration.class)
 @EnableConfigurationProperties({ ServerProperties.class, ResourceProperties.class })
-public class ErrorWebFluxByJsonAutoConfiguration {
+public class ErrorWebFluxByJsonAutoConfiguration {//ErrorWebFluxAutoConfiguration
 
 	private final ServerProperties serverProperties;
 
