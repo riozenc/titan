@@ -102,5 +102,22 @@ public class GateWayApp {
 				.build();
 
 	}
+	
+
+	/**
+	 * 档案服务
+	 * 
+	 * @param routeLocatorBuilder
+	 * @return
+	 */
+	@Bean
+	public RouteLocator cimManagerRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
+		return routeLocatorBuilder.routes()
+				.route(r -> r.path("/cimServer/**")
+						.filters(f -> f.filter(SpringContextHolder.getBean(BemServerFilter.class)))
+						.uri("lb://CIM-SERVER/"))
+				.build();
+
+	}
 
 }
