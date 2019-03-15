@@ -31,7 +31,7 @@ import com.google.gson.JsonElement;
 public class AuthorizationHandler {
 
 	private static final int SUCCESS = 200;
-	public final static String USER_ID = "userId";
+	public final static String MANAGER_ID = "managerId";
 	public final static String ROLE_IDS = "roleIds";
 	public final static String HEARDS_TOKEN = "Authorization";
 	private static final String LOGIN_TOKEN = "Basic dGVzdDp0ZXN0";

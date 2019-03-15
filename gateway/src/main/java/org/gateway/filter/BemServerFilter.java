@@ -121,14 +121,14 @@ public class BemServerFilter implements GatewayFilter {
 		Gson gson = new Gson();
 		JsonElement jsonElement = body == null ? new JsonObject() : gson.fromJson(body, JsonElement.class);
 		if (jsonElement.isJsonObject()) {
-			jsonElement.getAsJsonObject().addProperty(AuthorizationHandler.USER_ID, userId);
+			jsonElement.getAsJsonObject().addProperty(AuthorizationHandler.MANAGER_ID, userId);
 			jsonElement.getAsJsonObject().addProperty(AuthorizationHandler.ROLE_IDS, roleIds);
 		}
 		return jsonElement.toString();
 	}
 
 	private String tamperWithForm(String body, String userId, String roleIds) {
-		return new StringBuilder(null == body ? "" : body).append("&").append(AuthorizationHandler.USER_ID).append("=")
+		return new StringBuilder(null == body ? "" : body).append("&").append(AuthorizationHandler.MANAGER_ID).append("=")
 				.append(userId).append("&").append(AuthorizationHandler.ROLE_IDS).append("=").append(roleIds)
 				.toString();
 	}
