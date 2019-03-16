@@ -1,7 +1,7 @@
 /**
  *    Auth:riozenc
- *    Date:2019年3月5日 下午3:47:32
- *    Title:org.gateway.filter.BemServerFilter.java
+ *    Date:2019年3月16日 下午3:19:07
+ *    Title:org.gateway.filter.CimServerFilter.java
  **/
 package org.gateway.filter;
 
@@ -33,8 +33,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
-public class BemServerFilter extends DefaultAuthenticationInformationFilter implements GatewayFilter {
-	private static final Log log = LogFactory.getLog(BemServerFilter.class);
+public class CimServerFilter extends DefaultAuthenticationInformationFilter implements GatewayFilter {
+	private static final Log log = LogFactory.getLog(CimServerFilter.class);
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {

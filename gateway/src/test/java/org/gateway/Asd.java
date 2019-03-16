@@ -16,6 +16,11 @@ import reactor.core.publisher.Flux;
 public class Asd {
 	public static void main(String[] args) throws URISyntaxException {
 		List<String> list = new ArrayList<>();
+		
+		String temp = String.join(",", list);
+		
+		System.out.println(":::"+temp);
+		
 		list.add("a");
 		list.add("b");
 		list.add("c");

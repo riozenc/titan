@@ -2,6 +2,7 @@ package org.gateway;
 
 import org.gateway.custom.context.SpringContextHolder;
 import org.gateway.filter.BemServerFilter;
+import org.gateway.filter.CimServerFilter;
 import org.gateway.filter.PreGatewayFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,7 +103,6 @@ public class GateWayApp {
 				.build();
 
 	}
-	
 
 	/**
 	 * 档案服务
@@ -114,7 +114,7 @@ public class GateWayApp {
 	public RouteLocator cimManagerRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		return routeLocatorBuilder.routes()
 				.route(r -> r.path("/cimServer/**")
-						.filters(f -> f.filter(SpringContextHolder.getBean(BemServerFilter.class)))
+						.filters(f -> f.filter(SpringContextHolder.getBean(CimServerFilter.class)))
 						.uri("lb://CIM-SERVER/"))
 				.build();
 
