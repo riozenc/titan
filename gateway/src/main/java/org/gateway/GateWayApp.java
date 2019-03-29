@@ -83,8 +83,7 @@ public class GateWayApp {
 	 */
 	@Bean
 	public RouteLocator configLocator(RouteLocatorBuilder routeLocatorBuilder) {
-
-		return routeLocatorBuilder.routes().route(r -> r.path("/config/**/{seg}")
+		return routeLocatorBuilder.routes().route(r -> r.path("/titan-config/**/{seg}")
 				.filters(f -> f.filter(new PreGatewayFilter())).uri("lb://TITAN-CONFIG/")).build();
 	}
 
