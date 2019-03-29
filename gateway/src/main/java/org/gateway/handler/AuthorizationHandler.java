@@ -27,7 +27,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 @ControllerAdvice
-@RequestMapping("authorization1")
+@RequestMapping("authorization")
 public class AuthorizationHandler {
 
 	private static final int SUCCESS = 200;

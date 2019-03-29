@@ -76,6 +76,19 @@ public class GateWayApp {
 	}
 
 	/**
+	 * 配置中心
+	 * 
+	 * @param routeLocatorBuilder
+	 * @return
+	 */
+	@Bean
+	public RouteLocator configLocator(RouteLocatorBuilder routeLocatorBuilder) {
+
+		return routeLocatorBuilder.routes().route(r -> r.path("/config/**/{seg}")
+				.filters(f -> f.filter(new PreGatewayFilter())).uri("lb://TITAN-CONFIG/")).build();
+	}
+
+	/**
 	 * 用户管理
 	 * 
 	 * @param routeLocatorBuilder
