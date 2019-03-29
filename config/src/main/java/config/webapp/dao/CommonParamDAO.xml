@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="config.webapp.dao.CommonParamDAO">
+	<select id="findByKey" parameterType="CommonParamDomain"
+		resultType="CommonParamDomain" useCache="true">
+		select ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS from
+		SYSTEM_COMMON_CONFIG
+		<where>
+			and ID = #{id}
+
+		</where>
+	</select>
+	<select id="findByWhere" parameterType="CommonParamDomain"
+		resultType="CommonParamDomain" useCache="true">
+		select ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS from
+		SYSTEM_COMMON_CONFIG
+		<where>
+			<if test="id !=null">
+				and ID = #{id}
+			</if>
+			<if test="type !=null">
+				and TYPE = #{type}
+			</if>
+			<if test="paramKey !=null">
+				and PARAM_KEY = #{paramKey}
+			</if>
+			<if test="paramValue !=null">
+				and PARAM_VALUE = #{paramValue}
+			</if>
+			<if test="remark !=null">
+				and REMARK = #{remark}
+			</if>
+			<if test="status !=null">
+				and STATUS = #{status}
+			</if>
+		</where>
+	</select>
+	<insert id="insert" parameterType="CommonParamDomain"
+		flushCache="true">
+		insert into
+		SYSTEM_COMMON_CONFIG(ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS)
+		values (#{id},#{type},#{paramKey},#{paramValue},#{remark},#{status})
+	</insert>
+	<update id="update" parameterType="CommonParamDomain"
+		flushCache="true">
+		update SYSTEM_COMMON_CONFIG
+		<set>
+			<if test="type !=null">
+				TYPE = #{type},
+			</if>
+			<if test="paramKey !=null">
+				PARAM_KEY = #{paramKey},
+			</if>
+			<if test="paramValue !=null">
+				PARAM_VALUE = #{paramValue},
+			</if>
+			<if test="remark !=null">
+				REMARK = #{remark},
+			</if>
+			<if test="status !=null">
+				STATUS = #{status},
+			</if>
+		</set>
+		<where>
+			and ID = #{id}
+
+		</where>
+	</update>
+	<delete id="delete" parameterType="CommonParamDomain"
+		flushCache="true">
+		delete from SYSTEM_COMMON_CONFIG
+		<where>
+			and ID = #{id}
+
+		</where>
+	</delete>
+</mapper>

@@ -1,0 +1,18 @@
+server:
+ port: 11111
+ servlet:
+  context-path: /titan-config
+spring:
+ application:
+  name: titan-config
+eureka:
+  instance: 
+    prefer-ip-address: true
+    #ip-address: 172.21.29.75
+  client:
+    serviceUrl:
+      defaultZone: http://172.21.29.55:7777/eureka/
+logging:
+  level:
+    config: debug
+  path: log
