@@ -123,13 +123,17 @@ public class AuthorizationHandler {
 		requestHeaders.add(HEARDS_TOKEN, token);
 		HttpEntity<String> requestEntity = new HttpEntity<String>(null, requestHeaders);
 
-		ResponseEntity<String> responseEntity = restTemplate.exchange("http://AUTH-DATA/auth-data/dept/auth/tree",
+		ResponseEntity<String> responseEntity = restTemplate.exchange("http://AUTH-DATA/auth-data/dept/auth/table",
 				HttpMethod.GET, requestEntity, String.class);
 
-		JsonElement jsonElement = new Gson().fromJson(responseEntity.getBody(), JsonElement.class);
+		RestObject restObject = new Gson().fromJson(responseEntity.getBody(), RestObject.class);
+
+		if (!restObject.isSuccess()) {
+			throw new Exception(new Exception(restObject.getMessage()));
+		}
 
 		List<String> deptIdList = new ArrayList<>();
-		jsonElement.getAsJsonArray().forEach(json -> {
+		restObject.getData().getAsJsonArray().forEach(json -> {
 			deptIdList.add(json.getAsJsonObject().get("id").getAsString());
 		});
 
