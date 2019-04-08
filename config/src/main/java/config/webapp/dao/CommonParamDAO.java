@@ -1,6 +1,7 @@
 package config.webapp.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.riozenc.titanTool.annotation.TransactionDAO;
 import com.riozenc.titanTool.spring.webapp.dao.AbstractTransactionDAOSupport;
@@ -42,4 +43,14 @@ public class CommonParamDAO extends AbstractTransactionDAOSupport implements Bas
 		return getPersistanceManager().find(getNamespace() + ".findByWhere", t);
 	}
 
+
+	public List<CommonParamDomain> getAllType(CommonParamDomain t) {
+		// TODO Auto-generated method stub
+		return getPersistanceManager().find(getNamespace() + ".getAllType", t);
+	}
+
+	public List<CommonParamDomain> getAllTypeForList(String t) {
+		// TODO Auto-generated method stub
+		return getPersistanceManager().find(getNamespace() + ".getAllTypeForList", t);
+	}
 }

@@ -10,6 +10,7 @@
 
 		</where>
 	</select>
+
 	<select id="findByWhere" parameterType="CommonParamDomain"
 		resultType="CommonParamDomain" useCache="true">
 		select ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS from
@@ -35,6 +36,20 @@
 			</if>
 		</where>
 	</select>
+
+	<select id="getAllType" parameterType="CommonParamDomain"
+			resultType="CommonParamDomain" useCache="true">
+		select TYPE from
+		SYSTEM_COMMON_CONFIG t
+		 where t.TYPE is not null GROUP BY t.TYPE
+	</select>
+
+	<select id="getAllTypeForList" parameterType="CommonParamDomain"
+			resultType="CommonParamDomain" useCache="true">
+		select CONCAT(TYPE,'_',PARAM_KEY)as TYPE,PARAM_VALUE from SYSTEM_COMMON_CONFIG
+		 where TYPE is not null
+	</select>
+
 	<insert id="insert" parameterType="CommonParamDomain"
 		flushCache="true">
 		insert into

@@ -1,6 +1,7 @@
 package config.webapp.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import com.riozenc.titanTool.annotation.TransactionDAO;
 import com.riozenc.titanTool.annotation.TransactionService;
@@ -42,6 +43,19 @@ public class CommonParamServiceImpl implements ICommonParamService {
 	public List<CommonParamDomain> findByWhere(CommonParamDomain t) {
 		// TODO Auto-generated method stub
 		return commonParamDAO.findByWhere(t);
+	}
+
+
+	@Override
+	public List<CommonParamDomain> getAllType(CommonParamDomain domain) {
+
+		return commonParamDAO.getAllType(domain);
+	}
+
+	@Override
+	public List<CommonParamDomain> getAllTypeForList(String t) {
+
+		return commonParamDAO.getAllTypeForList(t);
 	}
 
 }
