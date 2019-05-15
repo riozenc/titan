@@ -2,6 +2,7 @@ package org.gateway;
 
 import org.gateway.custom.context.SpringContextHolder;
 import org.gateway.filter.BemServerFilter;
+import org.gateway.filter.BillingServerFilter;
 import org.gateway.filter.CimServerFilter;
 import org.gateway.filter.PreGatewayFilter;
 import org.slf4j.Logger;
@@ -128,6 +129,19 @@ public class GateWayApp {
 				.route(r -> r.path("/cimServer/**")
 						.filters(f -> f.filter(SpringContextHolder.getBean(CimServerFilter.class)))
 						.uri("lb://CIM-SERVER/"))
+				.build();
+
+	}
+
+	/**
+	 * billing服务（抄核账）
+	 */
+	@Bean
+	public RouteLocator billingRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
+		return routeLocatorBuilder.routes()
+				.route(r -> r.path("/billingServer/**")
+						.filters(f -> f.filter(SpringContextHolder.getBean(BillingServerFilter.class)))
+						.uri("lb://BILLING-SERVER/"))
 				.build();
 
 	}
