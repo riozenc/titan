@@ -44,7 +44,7 @@ public class ExceptionGlobalFilter implements GlobalFilter, Ordered {
 	public int getOrder() {
 		// TODO Auto-generated method stub
 
-		return -2;
+		return LOWEST_PRECEDENCE;
 	}
 
 	@Override

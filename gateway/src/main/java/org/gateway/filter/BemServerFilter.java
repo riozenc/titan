@@ -48,12 +48,7 @@ public class BemServerFilter extends DefaultAuthenticationInformationFilter impl
 			Mono<String> modifiedBody = serverRequest.bodyToMono(String.class)
 					// .log("modify_request_mono", Level.INFO)
 					.flatMap(body -> {
-						String params = null;
-						if (isApplicationJsonType(exchange.getRequest())) {
-							params = tamperWithJson(body, managerId, roleIds, deptIds);
-						} else {
-							params = tamperWithForm(body, managerId, roleIds, deptIds);
-						}
+						String params = changeBody(exchange.getRequest(), body, managerId, roleIds, deptIds);
 						return Mono.just(params);
 					}).defaultIfEmpty(tamperWithJson(null, managerId, roleIds, deptIds));
 
@@ -96,16 +91,35 @@ public class BemServerFilter extends DefaultAuthenticationInformationFilter impl
 
 	}
 
-	private boolean isApplicationJsonType(ServerHttpRequest serverHttpRequest) {
+	private String changeBody(ServerHttpRequest serverHttpRequest, String body, String managerId, String roleIds,
+			String deptIds) {
 		MediaType mediaType = serverHttpRequest.getHeaders().getContentType();
 		if (mediaType == null) {
-			return true;
+			return tamperWithJson(body, managerId, roleIds, deptIds);
+		}
+		if (mediaType.includes(MediaType.MULTIPART_FORM_DATA)) {
+			return body;
 		}
 		if (!mediaType.includes(MediaType.APPLICATION_FORM_URLENCODED)) {
-			return true;
+			return tamperWithJson(body, managerId, roleIds, deptIds);
+		} else {
+			return tamperWithForm(body, managerId, roleIds, deptIds);
 		}
-		return mediaType.includes(MediaType.APPLICATION_JSON);
 	}
+
+//	private boolean isApplicationJsonType(ServerHttpRequest serverHttpRequest) {
+//		MediaType mediaType = serverHttpRequest.getHeaders().getContentType();
+//		if (mediaType == null) {
+//			return true;
+//		}
+//		if (mediaType.includes(MediaType.MULTIPART_FORM_DATA)) {
+//			return false;
+//		}
+//		if (!mediaType.includes(MediaType.APPLICATION_FORM_URLENCODED)) {
+//			return true;
+//		}
+//		return mediaType.includes(MediaType.APPLICATION_JSON);
+//	}
 
 	private String tamperWithJson(String body, String userId, String roleIds, String deptIds) {
 		Gson gson = new Gson();

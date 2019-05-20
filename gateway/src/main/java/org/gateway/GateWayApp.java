@@ -37,10 +37,8 @@ public class GateWayApp {
 	@Bean
 	public RouteLocator testLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		Builder builder = routeLocatorBuilder.routes();
-
 		Builder asyncBuilder = builder.route(r -> r.path("/security/**").filters(f -> f.filter(new PreGatewayFilter()))
 				.uri("lb://SECURITY-SERVER/"));
-
 		RouteLocator routeLocator = asyncBuilder.build();
 		return routeLocator;
 	}
@@ -84,7 +82,7 @@ public class GateWayApp {
 	 */
 	@Bean
 	public RouteLocator configLocator(RouteLocatorBuilder routeLocatorBuilder) {
-		return routeLocatorBuilder.routes().route(r -> r.path("/titan-config/**/{seg}")
+		return routeLocatorBuilder.routes().route(r -> r.path("/titan-config/**")
 				.filters(f -> f.filter(new PreGatewayFilter())).uri("lb://TITAN-CONFIG/")).build();
 	}
 
@@ -96,7 +94,6 @@ public class GateWayApp {
 	 */
 	@Bean
 	public RouteLocator userManagerRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
-
 		return routeLocatorBuilder.routes().route(r -> r.path("/userServer/**/{seg}")
 				.filters(f -> f.filter(new PreGatewayFilter())).uri("lb://USER-SERVER/")).build();
 	}
@@ -114,7 +111,6 @@ public class GateWayApp {
 						.filters(f -> f.filter(SpringContextHolder.getBean(BemServerFilter.class)))
 						.uri("lb://BEM-SERVER/"))
 				.build();
-
 	}
 
 	/**
