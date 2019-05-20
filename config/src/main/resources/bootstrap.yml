@@ -5,6 +5,14 @@ server:
 spring:
  application:
   name: titan-config
+ servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+ resources:
+   static-locations: file:D://titan-file
+ mvc:
+   static-path-pattern: /**
 eureka:
   instance: 
     prefer-ip-address: true
