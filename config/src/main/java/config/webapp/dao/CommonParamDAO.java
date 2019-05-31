@@ -44,7 +44,7 @@ public class CommonParamDAO extends AbstractTransactionDAOSupport implements Bas
 	}
 
 
-	public List<CommonParamDomain> getAllType(CommonParamDomain t) {
+	public List<CommonParamDomain> getAllType(String t) {
 		// TODO Auto-generated method stub
 		return getPersistanceManager().find(getNamespace() + ".getAllType", t);
 	}

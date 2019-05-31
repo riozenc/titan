@@ -39,7 +39,7 @@
 
 	<select id="getAllType" parameterType="CommonParamDomain"
 			resultType="CommonParamDomain" useCache="true">
-		select TYPE from
+		select t.TYPE from
 		SYSTEM_COMMON_CONFIG t
 		 where t.TYPE is not null GROUP BY t.TYPE
 	</select>
