@@ -59,4 +59,10 @@ public class ConfigAction {
 		}
 		return ListValueMap;
 	}
+
+	@PostMapping("getCurrentMon")
+	@ResponseBody
+	public Object getCurrentMon() throws Exception {
+		return commonParamService.getCurrentMon();
+	}
 }

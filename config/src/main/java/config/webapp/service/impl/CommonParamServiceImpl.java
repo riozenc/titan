@@ -1,7 +1,6 @@
 package config.webapp.service.impl;
 
 import java.util.List;
-import java.util.Map;
 
 import com.riozenc.titanTool.annotation.TransactionDAO;
 import com.riozenc.titanTool.annotation.TransactionService;
@@ -45,7 +44,6 @@ public class CommonParamServiceImpl implements ICommonParamService {
 		return commonParamDAO.findByWhere(t);
 	}
 
-
 	@Override
 	public List<CommonParamDomain> getAllType(CommonParamDomain domain) {
 
@@ -56,6 +54,23 @@ public class CommonParamServiceImpl implements ICommonParamService {
 	public List<CommonParamDomain> getAllTypeForList(String t) {
 
 		return commonParamDAO.getAllTypeForList(t);
+	}
+
+	@Override
+	public String getCurrentMon() throws Exception {
+		// TODO Auto-generated method stub
+
+		CommonParamDomain commonParamDomain = new CommonParamDomain();
+
+		commonParamDomain.setType("CURRENT_MON");
+		commonParamDomain.setParamKey(0);
+		commonParamDomain.setStatus((byte)1);
+
+		List<CommonParamDomain> list = commonParamDAO.findByWhere(commonParamDomain);
+		if (list.isEmpty()) {
+			throw new Exception("未找到月份数据.");
+		}
+		return list.get(0).getParamValue();
 	}
 
 }
