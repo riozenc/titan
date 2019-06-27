@@ -6,6 +6,7 @@
 package org.gateway.filter;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.gateway.handler.AuthorizationHandler;
 import org.gateway.handler.AuthorizationHandler.RestObject;
@@ -32,6 +33,10 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 		// TODO Auto-generated method stub
 
+		if (isStaticResources(exchange.getRequest().getURI())) {
+			return chain.filter(exchange);
+		}
+
 		HttpHeaders httpHeaders = exchange.getRequest().getHeaders();
 
 		String token = httpHeaders.getFirst(AuthorizationHandler.HEARDS_TOKEN);
@@ -53,6 +58,13 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 		return Mono.error(new Exception(result));
 	}
 
+	public boolean isStaticResources(URI uri) {
+		if (uri.getPath().contains("static")) {
+			return true;
+		}
+		return false;
+	}
+
 	public boolean isSecurityURI(URI uri) {
 		if (uri.getPath().contains("security")) {
 			return true;
@@ -65,4 +77,5 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 		// 最高优先级
 		return HIGHEST_PRECEDENCE;
 	}
+
 }
