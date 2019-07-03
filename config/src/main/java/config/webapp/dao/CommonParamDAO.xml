@@ -38,16 +38,18 @@
 	</select>
 
 	<select id="getAllType" parameterType="CommonParamDomain"
-			resultType="CommonParamDomain" useCache="true">
+		resultType="CommonParamDomain" useCache="true">
 		select TYPE from
 		SYSTEM_COMMON_CONFIG t
-		 where t.TYPE is not null GROUP BY t.TYPE
+		where t.TYPE is not null GROUP BY t.TYPE
 	</select>
 
 	<select id="getAllTypeForList" parameterType="CommonParamDomain"
-			resultType="CommonParamDomain" useCache="true">
-		select CONCAT(TYPE,'_',PARAM_KEY)as TYPE,PARAM_VALUE from SYSTEM_COMMON_CONFIG
-		 where TYPE is not null
+		resultType="CommonParamDomain" useCache="true">
+		select
+		CONCAT(TYPE,'_',PARAM_KEY)as TYPE,PARAM_VALUE from
+		SYSTEM_COMMON_CONFIG
+		where TYPE is not null
 	</select>
 
 	<insert id="insert" parameterType="CommonParamDomain"
@@ -60,12 +62,7 @@
 		flushCache="true">
 		update SYSTEM_COMMON_CONFIG
 		<set>
-			<if test="type !=null">
-				TYPE = #{type},
-			</if>
-			<if test="paramKey !=null">
-				PARAM_KEY = #{paramKey},
-			</if>
+
 			<if test="paramValue !=null">
 				PARAM_VALUE = #{paramValue},
 			</if>
@@ -77,7 +74,12 @@
 			</if>
 		</set>
 		<where>
-			and ID = #{id}
+
+			TYPE = #{type}
+
+			<if test="paramKey !=null">
+				and PARAM_KEY = #{paramKey}
+			</if>
 
 		</where>
 	</update>

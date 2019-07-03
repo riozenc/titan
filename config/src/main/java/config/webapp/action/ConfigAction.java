@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.riozenc.titanTool.spring.web.http.HttpResult;
+
 import config.webapp.domain.CommonParamDomain;
 import config.webapp.service.ICommonParamService;
 
@@ -64,5 +66,15 @@ public class ConfigAction {
 	@ResponseBody
 	public Object getCurrentMon() throws Exception {
 		return commonParamService.getCurrentMon();
+	}
+
+	@PostMapping("update")
+	@ResponseBody
+	public Object update(@RequestBody CommonParamDomain commonParamDomain) {
+		int i = commonParamService.update(commonParamDomain);
+		if (i > 0)
+			return new HttpResult(HttpResult.SUCCESS, "更新成功");
+		else
+			return new HttpResult(HttpResult.ERROR, "更新失败");
 	}
 }
