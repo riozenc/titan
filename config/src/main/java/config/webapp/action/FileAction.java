@@ -36,12 +36,18 @@ public class FileAction {
     @ResponseBody
     public RestultContent upload(MultipartFile file) throws IllegalStateException, IOException {
 
+        //判断系统
+        String os = System.getProperty("os.name");
+        String sysFile=Global.getConfig("linux.project.path");
+        if (os.toLowerCase().startsWith("win")) {
+            sysFile=Global.getConfig("win.project.path");
+        }
         RestultContent restultContent = new RestultContent();
         Map<String, String> returnMap = new HashMap<>();
         if (!file.isEmpty()) {
             //绝对路径 采用日期+随机数文件夹名
             String basePath = getFileFolderNew();
-            String absolutePath = Global.getConfig("project.path") + File.separator +
+            String absolutePath = sysFile + File.separator +
                     Global.getConfig("file.doc.path") + File.separator + basePath;
             //相对路径
             String relativePath = File.separator + Global.getConfig("file.doc.path") + File.separator + basePath;
