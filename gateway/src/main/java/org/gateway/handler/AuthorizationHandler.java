@@ -5,10 +5,10 @@
  **/
 package org.gateway.handler;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.gateway.entity.AuthorizationEntity;
+import org.gateway.entity.LoginEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -42,12 +42,12 @@ public class AuthorizationHandler {
 
 	@ResponseBody
 	@RequestMapping(params = "method=login")
-	public String login(AuthorizationEntity authorizationEntity) {
+	public String login(LoginEntity loginEntity) {
 
-		if (ObjectUtils.isEmpty(authorizationEntity.getUsername())) {
+		if (ObjectUtils.isEmpty(loginEntity.getUsername())) {
 			return "username 为 空";
 		}
-		if (ObjectUtils.isEmpty(authorizationEntity.getPassword())) {
+		if (ObjectUtils.isEmpty(loginEntity.getPassword())) {
 			return "password 为 空";
 		}
 
@@ -56,8 +56,8 @@ public class AuthorizationHandler {
 
 		// body
 		MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-		requestBody.add("username", authorizationEntity.getUsername());
-		requestBody.add("password", authorizationEntity.getPassword());
+		requestBody.add("username", loginEntity.getUsername());
+		requestBody.add("password", loginEntity.getPassword());
 		requestBody.add("grant_type", "password");
 
 		HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<MultiValueMap<String, String>>(
@@ -104,7 +104,7 @@ public class AuthorizationHandler {
 			throw new Exception(new Exception(restObject.getMessage()));
 		}
 
-		List<String> roleIdList = new ArrayList<>();
+		Set<String> roleIdList = new HashSet<>();
 		restObject.getData().getAsJsonArray().forEach(json -> {
 			roleIdList.add(json.getAsJsonObject().get("id").getAsString());
 		});
@@ -132,7 +132,7 @@ public class AuthorizationHandler {
 			throw new Exception(new Exception(restObject.getMessage()));
 		}
 
-		List<String> deptIdList = new ArrayList<>();
+		Set<String> deptIdList = new HashSet<>();
 		restObject.getData().getAsJsonArray().forEach(json -> {
 			deptIdList.add(json.getAsJsonObject().get("id").getAsString());
 		});

@@ -3,6 +3,7 @@ package org.gateway;
 import org.gateway.custom.context.SpringContextHolder;
 import org.gateway.filter.BemServerFilter;
 import org.gateway.filter.BillingServerFilter;
+import org.gateway.filter.CfsFilter;
 import org.gateway.filter.CimServerFilter;
 import org.gateway.filter.PreGatewayFilter;
 import org.slf4j.Logger;
@@ -139,6 +140,13 @@ public class GateWayApp {
 						.filters(f -> f.filter(SpringContextHolder.getBean(BillingServerFilter.class)))
 						.uri("lb://BILLING-SERVER/"))
 				.build();
+
+	}
+
+	@Bean
+	public RouteLocator cfsRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
+		return routeLocatorBuilder.routes().route(r -> r.path("/cfs/**")
+				.filters(f -> f.filter(SpringContextHolder.getBean(CfsFilter.class))).uri("lb://CFS/")).build();
 
 	}
 

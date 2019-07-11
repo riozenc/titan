@@ -12,6 +12,7 @@ public class DefaultAuthenticationInformationFilter implements AuthenticationInf
 	@Autowired
 	private AuthorizationHandler authorizationHandler;
 
+	@Override
 	public String getUserId(String token) throws Exception {
 		// TODO Auto-generated method stub
 		return authorizationHandler.getUser(token);

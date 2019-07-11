@@ -1,8 +1,9 @@
 /**
- *    Auth:riozenc
- *    Date:2019年3月5日 下午3:47:32
- *    Title:org.gateway.filter.BemServerFilter.java
- **/
+ * Author : czy
+ * Date : 2019年6月23日 下午2:23:17
+ * Title : org.gateway.filter.CfsFilter.java
+ *
+**/
 package org.gateway.filter;
 
 import org.apache.commons.logging.Log;
@@ -33,8 +34,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
-public class BemServerFilter extends DefaultAuthenticationInformationFilter implements GatewayFilter {
-	private static final Log log = LogFactory.getLog(BemServerFilter.class);
+public class CfsFilter extends DefaultAuthenticationInformationFilter implements GatewayFilter {
+	private static final Log log = LogFactory.getLog(CfsFilter.class);
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -106,8 +107,6 @@ public class BemServerFilter extends DefaultAuthenticationInformationFilter impl
 			return tamperWithForm(body, managerId, roleIds, deptIds);
 		}
 	}
-
-
 
 	private String tamperWithJson(String body, String userId, String roleIds, String deptIds) {
 		Gson gson = new Gson();
