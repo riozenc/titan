@@ -45,9 +45,9 @@ public class CommonParamServiceImpl implements ICommonParamService {
 	}
 
 	@Override
-	public List<CommonParamDomain> getAllType(CommonParamDomain domain) {
+	public List<CommonParamDomain> getAllType(String t) {
 
-		return commonParamDAO.getAllType(domain);
+		return commonParamDAO.getAllType(t);
 	}
 
 	@Override

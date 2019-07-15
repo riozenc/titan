@@ -37,7 +37,7 @@ public class ConfigAction {
 	public Object getAllSysCommConfig(@RequestBody String a) {
 		Map<String, List<CommonParamDomain>> dropMap = new HashMap<String, List<CommonParamDomain>>();
 		CommonParamDomain domain = new CommonParamDomain();
-		List<CommonParamDomain> typeList = commonParamService.getAllType(domain);
+		List<CommonParamDomain> typeList = commonParamService.getAllType(a);
 		for (CommonParamDomain dom : typeList) {
 			domain.setType(dom.getType());
 			List<CommonParamDomain> list = commonParamService.findByWhere(domain);

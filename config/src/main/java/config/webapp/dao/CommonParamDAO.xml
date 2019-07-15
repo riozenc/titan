@@ -38,6 +38,8 @@
 	</select>
 
 	<select id="getAllType" parameterType="CommonParamDomain"
+			resultType="CommonParamDomain" useCache="true">
+		select t.TYPE from
 		resultType="CommonParamDomain" useCache="true">
 		select TYPE from
 		SYSTEM_COMMON_CONFIG t

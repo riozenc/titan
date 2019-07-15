@@ -9,7 +9,7 @@ import config.webapp.domain.CommonParamDomain;
 public interface ICommonParamService extends BaseService<CommonParamDomain>{
 
 
-    public List<CommonParamDomain> getAllType(CommonParamDomain domain);
+    public List<CommonParamDomain> getAllType(String t);
     public List<CommonParamDomain> getAllTypeForList(String t);
     
     public String getCurrentMon() throws Exception;
