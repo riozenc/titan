@@ -20,7 +20,7 @@ eureka:
   client:
     serviceUrl:
       #defaultZone: http://172.21.29.55:7777/eureka/
-      defaultZone: http://172.20.100.29:7777/eureka/
+      defaultZone: http://10.1.0.192:7777/eureka/
 logging:
   level:
     config: debug
