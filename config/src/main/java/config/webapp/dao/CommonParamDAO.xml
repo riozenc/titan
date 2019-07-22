@@ -3,19 +3,21 @@
 <mapper namespace="config.webapp.dao.CommonParamDAO">
 	<select id="findByKey" parameterType="CommonParamDomain"
 		resultType="CommonParamDomain" useCache="true">
-		select ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS from
+		select ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS,PRARM_ORDER from
 		SYSTEM_COMMON_CONFIG
 		<where>
 			and ID = #{id}
-
+			And STATUS=1
 		</where>
+		order by PRARM_ORDER
 	</select>
 
 	<select id="findByWhere" parameterType="CommonParamDomain"
 		resultType="CommonParamDomain" useCache="true">
-		select ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS from
+		select ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS,PRARM_ORDER from
 		SYSTEM_COMMON_CONFIG
 		<where>
+			And STATUS=1
 			<if test="id !=null">
 				and ID = #{id}
 			</if>
@@ -35,15 +37,16 @@
 				and STATUS = #{status}
 			</if>
 		</where>
+		order by PRARM_ORDER
 	</select>
 
 	<select id="getAllType" parameterType="CommonParamDomain"
 			resultType="CommonParamDomain" useCache="true">
-		select t.TYPE from
-		resultType="CommonParamDomain" useCache="true">
 		select TYPE from
 		SYSTEM_COMMON_CONFIG t
-		where t.TYPE is not null GROUP BY t.TYPE
+		where t.TYPE is not null
+		And STATUS=1
+		GROUP BY t.TYPE
 	</select>
 
 	<select id="getAllTypeForList" parameterType="CommonParamDomain"
@@ -52,13 +55,16 @@
 		CONCAT(TYPE,'_',PARAM_KEY)as TYPE,PARAM_VALUE from
 		SYSTEM_COMMON_CONFIG
 		where TYPE is not null
+		And STATUS=1
+		ORDER BY SYSTEM_COMMON_CONFIG.TYPE,PRARM_ORDER
 	</select>
 
 	<insert id="insert" parameterType="CommonParamDomain"
 		flushCache="true">
 		insert into
-		SYSTEM_COMMON_CONFIG(ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS)
-		values (#{id},#{type},#{paramKey},#{paramValue},#{remark},#{status})
+		SYSTEM_COMMON_CONFIG(ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS,PARAM_ORDER)
+		values
+		(#{id},#{type},#{paramKey},#{paramValue},#{remark},#{status},#{paramOrder})
 	</insert>
 	<update id="update" parameterType="CommonParamDomain"
 		flushCache="true">
@@ -93,4 +99,11 @@
 
 		</where>
 	</delete>
+
+	<select id="getDistinctRemark" 	resultType="String"
+			useCache="true">
+		select
+		distinct REMARK from
+		SYSTEM_COMMON_CONFIG
+	</select>
 </mapper>

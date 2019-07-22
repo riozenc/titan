@@ -3,6 +3,7 @@ package config.webapp.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.riozenc.titanTool.annotation.PaginationSupport;
 import com.riozenc.titanTool.annotation.TransactionDAO;
 import com.riozenc.titanTool.spring.webapp.dao.AbstractTransactionDAOSupport;
 import com.riozenc.titanTool.spring.webapp.dao.BaseDAO;
@@ -38,6 +39,7 @@ public class CommonParamDAO extends AbstractTransactionDAOSupport implements Bas
 	}
 
 	@Override
+    @PaginationSupport
 	public List<CommonParamDomain> findByWhere(CommonParamDomain t) {
 		// TODO Auto-generated method stub
 		return getPersistanceManager().find(getNamespace() + ".findByWhere", t);
@@ -52,5 +54,11 @@ public class CommonParamDAO extends AbstractTransactionDAOSupport implements Bas
 	public List<CommonParamDomain> getAllTypeForList(String t) {
 		// TODO Auto-generated method stub
 		return getPersistanceManager().find(getNamespace() + ".getAllTypeForList", t);
+	}
+	//获取不同的备注
+	public List<String> getDistinctRemark() {
+		// TODO Auto-generated method stub
+		return getPersistanceManager().find(getNamespace() +
+                ".getDistinctRemark", new Object());
 	}
 }

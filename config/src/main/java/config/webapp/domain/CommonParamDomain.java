@@ -2,14 +2,16 @@ package config.webapp.domain;
 
 import com.riozenc.titanTool.annotation.TablePrimaryKey;
 import com.riozenc.titanTool.mybatis.MybatisEntity;
+import com.riozenc.titanTool.mybatis.pagination.Page;
 
-public class CommonParamDomain implements MybatisEntity {
+public class CommonParamDomain extends Page implements MybatisEntity {
 
 	@TablePrimaryKey
 	private Long id;
 	private String type;
 	private Integer paramKey;
 	private String paramValue;
+	private Integer paramOrder;
 	private String remark;
 	private Byte status;
 
@@ -29,15 +31,15 @@ public class CommonParamDomain implements MybatisEntity {
 		this.type = type;
 	}
 
-	public Integer getParamKey() {
-		return paramKey;
-	}
+    public Integer getParamKey() {
+        return paramKey;
+    }
 
-	public void setParamKey(Integer paramKey) {
-		this.paramKey = paramKey;
-	}
+    public void setParamKey(Integer paramKey) {
+        this.paramKey = paramKey;
+    }
 
-	public String getParamValue() {
+    public String getParamValue() {
 		return paramValue;
 	}
 
@@ -61,4 +63,11 @@ public class CommonParamDomain implements MybatisEntity {
 		this.status = status;
 	}
 
+    public Integer getParamOrder() {
+        return paramOrder;
+    }
+
+    public void setParamOrder(Integer paramOrder) {
+        this.paramOrder = paramOrder;
+    }
 }

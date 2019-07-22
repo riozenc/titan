@@ -73,4 +73,8 @@ public class CommonParamServiceImpl implements ICommonParamService {
 		return list.get(0).getParamValue();
 	}
 
+	@Override
+	public List<String> getDistinctRemark(){
+		return commonParamDAO.getDistinctRemark();
+	}
 }
