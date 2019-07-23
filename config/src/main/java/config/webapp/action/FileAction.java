@@ -8,6 +8,7 @@ package config.webapp.action;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -73,32 +74,62 @@ public class FileAction {
 
     /**
      * 测试下载
-     *
+     * 默认保存在D://titan-file//年月日
      * @param fileIson
      * @return
      * @throws Exception
      */
     @RequestMapping("/downLoad")
-    public ResponseEntity<byte[]> fileDownLoad(@RequestBody(required = false) String fileIson) throws Exception {
+    public RestultContent fileDownLoad(@RequestBody(required = false) String fileIson) throws Exception {
 
         CommonFile commonFile = JSONUtil.readValue(fileIson, CommonFile.class);
-        String fileName = "aaa.doc";
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd");
+        FileOutputStream fos=null;
+        File file=null;
+        HttpURLConnection conn = null;
+        String fileName = commonFile.getFileName();
         String realPath = commonFile.getFilePath();//得到文件所在位置
-        //通过http请求访问文件
-        URL url = new URL("http://172.20.100.29:9922/titan-config/static/20190522160322_dcece0d0-4fc1-4253-96b9-ae27677955a2/aaa.doc");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        InputStream in = conn.getInputStream();
-        byte[] body = null;
-        body = new byte[in.available()];
-        in.read(body);
+        RestultContent restultContent=new RestultContent();
+        try {
+            //通过http请求访问文件
+            String urlPath=commonFile.getFilePath().replaceAll(fileName,URLDecoder.decode(fileName,"utf-8"));
+            URL url = new URL(urlPath.replaceAll("\\\\", "/"));
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("Content-type","application/x-www-form-urlencoded;charset=UTF-8");
+            conn.setRequestProperty("Accept-Language", "zh-CN");
+            conn.setRequestProperty("Charset", "UTF-8");
+            conn.setRequestMethod("GET");
+            InputStream in = conn.getInputStream();
+            //建立内存到硬盘的连接
+            file=new File(Global.getConfig("win.project.path")
+                    +File.separator+fmt.format(new Date())+File.separator+fileName);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "attachment;filename=abc.txt");
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            fos=new FileOutputStream(file);
 
-        HttpStatus statusCode = HttpStatus.OK;
+            byte[] b=new byte[1024];
+            int len=0;
+            while((len=in.read(b))!=-1){  //先读到内存
+                fos.write(b, 0, len);
+            }
+            fos.flush();
+            restultContent.setStatus(200);
+        }catch (Exception e){
+            e.printStackTrace();
+            restultContent.setStatus(300);
+            restultContent.setErrorMsg("下载失败");
+        }finally {
+            if(fos!=null){
+                fos.close();
+            }
+            if(conn!=null){
+                conn.disconnect();
+            }
+            return restultContent;
+        }
 
-        ResponseEntity<byte[]> response = new ResponseEntity<byte[]>(body, headers, statusCode);
-        return response;
     }
 
 
