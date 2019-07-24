@@ -10,17 +10,17 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
  resources:
-   static-locations: file:D://titan-file
+   static-locations: file:D://titan-file/static,file:/home/titan/titan-file/static
  mvc:
-   static-path-pattern: /**
+   static-path-pattern: /static/**
 eureka:
   instance: 
     prefer-ip-address: true
     #ip-address: 172.21.29.75
   client:
     serviceUrl:
-      #defaultZone: http://172.21.29.55:7777/eureka/
-      defaultZone: http://10.1.0.192:7777/eureka/
+      defaultZone: http://172.21.29.55:7777/eureka/
+      #defaultZone: http://10.1.0.192:7777/eureka/
 logging:
   level:
     config: debug

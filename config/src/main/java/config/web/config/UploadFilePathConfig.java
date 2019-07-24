@@ -1,3 +1,4 @@
+/*
 package config.web.config;
 
 import com.riozenc.titanTool.properties.Global;
@@ -8,6 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.io.File;
 
 @Configuration
+//垃圾
 public class UploadFilePathConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -20,7 +22,8 @@ public class UploadFilePathConfig implements WebMvcConfigurer {
                     addResourceLocations("file:"+sysFile+ File.separator);
         }else{
             registry.addResourceHandler(Global.getConfig("staticResourceHandler")).
-                    addResourceLocations("file:"+sysFile+ File.separator);
+                    addResourceLocations("file:///home/titan/titan-file");
         }
     }
 }
+*/
