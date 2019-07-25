@@ -3,18 +3,18 @@
 <mapper namespace="config.webapp.dao.CommonParamDAO">
 	<select id="findByKey" parameterType="CommonParamDomain"
 		resultType="CommonParamDomain" useCache="true">
-		select ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS,PRARM_ORDER from
+		select ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS,PARAM_ORDER from
 		SYSTEM_COMMON_CONFIG
 		<where>
 			and ID = #{id}
 			And STATUS=1
 		</where>
-		order by PRARM_ORDER
+		order by PARAM_ORDER
 	</select>
 
 	<select id="findByWhere" parameterType="CommonParamDomain"
 		resultType="CommonParamDomain" useCache="true">
-		select ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS,PRARM_ORDER from
+		select ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS,PARAM_ORDER from
 		SYSTEM_COMMON_CONFIG
 		<where>
 			And STATUS=1
@@ -37,7 +37,7 @@
 				and STATUS = #{status}
 			</if>
 		</where>
-		order by PRARM_ORDER
+		order by PARAM_ORDER
 	</select>
 
 	<select id="getAllType" parameterType="CommonParamDomain"
@@ -56,7 +56,7 @@
 		SYSTEM_COMMON_CONFIG
 		where TYPE is not null
 		And STATUS=1
-		ORDER BY SYSTEM_COMMON_CONFIG.TYPE,PRARM_ORDER
+		ORDER BY SYSTEM_COMMON_CONFIG.TYPE,PARAM_ORDER
 	</select>
 
 	<insert id="insert" parameterType="CommonParamDomain"

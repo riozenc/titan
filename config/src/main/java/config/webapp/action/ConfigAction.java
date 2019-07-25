@@ -1,5 +1,6 @@
 package config.webapp.action;
 
+import com.alibaba.druid.sql.visitor.functions.If;
 import com.riozenc.titanTool.common.json.utils.GsonUtils;
 import com.riozenc.titanTool.spring.web.http.HttpResult;
 import config.webapp.domain.CommonParamDomain;
@@ -21,8 +22,9 @@ public class ConfigAction {
     @Autowired
     @Qualifier("commonParamServiceImpl")
     private ICommonParamService commonParamService;
+
     @PostMapping("test")
-    public void test(@RequestBody String a){
+    public void test(@RequestBody String a) {
         synchronized (a) {
             System.out.println(a);
         }
@@ -73,12 +75,27 @@ public class ConfigAction {
 
     @PostMapping("update")
     @ResponseBody
-    public Object update(@RequestBody CommonParamDomain commonParamDomain) {
-        int i = commonParamService.update(commonParamDomain);
-        if (i > 0)
-            return new HttpResult(HttpResult.SUCCESS, "更新成功");
-        else
-            return new HttpResult(HttpResult.ERROR, "更新失败");
+    public RestultContent update(@RequestBody CommonParamDomain c) {
+        RestultContent restultContent=new RestultContent();
+        CommonParamDomain commonParamDomain = new CommonParamDomain();
+        commonParamDomain.setType(c.getType());
+        commonParamDomain.setParamKey(c.getParamKey());
+        List<CommonParamDomain> commonParamDomains =
+                commonParamService.findByWhere(commonParamDomain);
+        restultContent.setStatus(200);
+        if (commonParamDomains != null && commonParamDomains.size() > 0) {
+            restultContent.setStatus(300);
+            restultContent.setErrorMsg("更新异常:已存相同的下拉标识与下拉值");
+            return restultContent;
+        }
+        try {
+            commonParamService.update(c);
+        }catch (Exception e){
+            e.printStackTrace();
+            restultContent.setStatus(300);
+            restultContent.setErrorMsg("更新失败");
+        }
+        return restultContent;
     }
 
     //获取下拉备注
@@ -88,8 +105,27 @@ public class ConfigAction {
         return commonParamService.getDistinctRemark();
     }
 
-    private int insert(CommonParamDomain c) {
-        return commonParamService.insert(c);
+    private RestultContent insert(CommonParamDomain c) {
+        RestultContent restultContent=new RestultContent();
+        CommonParamDomain commonParamDomain = new CommonParamDomain();
+        commonParamDomain.setType(c.getType());
+        commonParamDomain.setParamKey(c.getParamKey());
+        List<CommonParamDomain> commonParamDomains =
+                commonParamService.findByWhere(commonParamDomain);
+        restultContent.setStatus(200);
+        if (commonParamDomains != null && commonParamDomains.size() > 0) {
+            restultContent.setStatus(300);
+            restultContent.setErrorMsg("新增异常:已存相同的下拉标识与下拉值");
+            return restultContent;
+        }
+        try {
+            commonParamService.insert(c);
+        }catch (Exception e){
+            e.printStackTrace();
+            restultContent.setStatus(300);
+            restultContent.setErrorMsg("新增失败");
+        }
+        return restultContent;
     }
 
     //获取下拉备注
@@ -98,18 +134,12 @@ public class ConfigAction {
     public RestultContent updateCommonParam(@RequestBody String insertJson) throws IOException {
         RestultContent restultContent = new RestultContent();
         CommonParamDomain commonParamDomain =
-                GsonUtils.readValue(insertJson,CommonParamDomain.class);
-        try {
-            //更新
-            if(commonParamDomain.getId()==null){
-                insert(commonParamDomain);
-            }else{
-                update(commonParamDomain);
-            }
-            restultContent.setStatus(200);
-        } catch (Exception e) {
-            restultContent.setStatus(300);
-            restultContent.setErrorMsg("操作失败");
+                GsonUtils.readValue(insertJson, CommonParamDomain.class);
+        //更新
+        if (commonParamDomain.getId() == null) {
+            restultContent=insert(commonParamDomain);
+        } else {
+            restultContent=update(commonParamDomain);
         }
         return restultContent;
     }
