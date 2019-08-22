@@ -41,6 +41,13 @@ public class ConfigAction {
 		return list;
 	}
 
+	@PostMapping("findByWhere")
+	@ResponseBody
+	public Object findByWhere(@RequestBody CommonParamDomain commonParamDomain) {
+		List<CommonParamDomain> typeList = commonParamService.findByWhere(commonParamDomain);
+		return typeList;
+	}
+
 	@PostMapping("getAllSysCommConfig")
 	@ResponseBody
 	public Object getAllSysCommConfig(@RequestBody String a) {
@@ -52,7 +59,6 @@ public class ConfigAction {
 			List<CommonParamDomain> list = commonParamService.findByWhere(domain);
 			dropMap.put(dom.getType(), list);
 		}
-
 		return dropMap;
 	}
 
