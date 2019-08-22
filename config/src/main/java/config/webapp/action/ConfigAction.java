@@ -81,14 +81,14 @@ public class ConfigAction {
 	@ResponseBody
 	public HttpResult update(@RequestBody CommonParamDomain c) {
 
-		CommonParamDomain commonParamDomain = new CommonParamDomain();
-		commonParamDomain.setType(c.getType());
-		commonParamDomain.setParamKey(c.getParamKey());
-		List<CommonParamDomain> commonParamDomains = commonParamService.findByWhere(commonParamDomain);
+//		CommonParamDomain commonParamDomain = new CommonParamDomain();
+//		commonParamDomain.setType(c.getType());
+//		commonParamDomain.setParamKey(c.getParamKey());
+//		List<CommonParamDomain> commonParamDomains = commonParamService.findByWhere(commonParamDomain);
 
-		if (commonParamDomains != null && commonParamDomains.size() > 0) {
-			return new HttpResult(HttpResult.ERROR, "更新异常:已存相同的下拉标识与下拉值");
-		}
+//		if (commonParamDomains != null && commonParamDomains.size() > 0) {
+//			return new HttpResult(HttpResult.ERROR, "更新异常:已存相同的下拉标识与下拉值");
+//		}
 		try {
 			commonParamService.update(c);
 		} catch (Exception e) {
