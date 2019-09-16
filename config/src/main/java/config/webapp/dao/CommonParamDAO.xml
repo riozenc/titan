@@ -9,7 +9,7 @@
 			and ID = #{id}
 			And STATUS=1
 		</where>
-		order by PARAM_ORDER
+		order by isnull(PARAM_ORDER),PARAM_ORDER
 	</select>
 
 	<select id="findByWhere" parameterType="CommonParamDomain"
@@ -37,7 +37,7 @@
 				and STATUS = #{status}
 			</if>
 		</where>
-		order by PARAM_ORDER
+		order by isnull(PARAM_ORDER),PARAM_ORDER
 	</select>
 
 	<select id="getAllType" parameterType="CommonParamDomain"
@@ -56,7 +56,7 @@
 		SYSTEM_COMMON_CONFIG
 		where TYPE is not null
 		And STATUS=1
-		ORDER BY SYSTEM_COMMON_CONFIG.TYPE,PARAM_ORDER
+		ORDER BY SYSTEM_COMMON_CONFIG.TYPE,isnull(PARAM_ORDER),PARAM_ORDER
 	</select>
 
 	<insert id="insert" parameterType="CommonParamDomain"
@@ -70,7 +70,9 @@
 		flushCache="true">
 		update SYSTEM_COMMON_CONFIG
 		<set>
-
+			<if test="paramOrder !=null">
+				PARAM_ORDER = #{paramOrder},
+			</if>
 			<if test="paramValue !=null">
 				PARAM_VALUE = #{paramValue},
 			</if>
