@@ -8,6 +8,8 @@ package org.gateway.filter;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.gateway.handler.AuthorizationHandler;
 import org.gateway.handler.AuthorizationHandler.RestObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
-
+	private static final Log log = LogFactory.getLog(ToeknGlobalGateWayFilter.class);
 	@Autowired
 	private RestTemplate restTemplate;
 
@@ -41,6 +43,10 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 
 		String token = httpHeaders.getFirst(AuthorizationHandler.HEARDS_TOKEN);
 
+		if (log.isDebugEnabled()) {
+			log.info(token);
+		}
+
 		if (null == token) {
 			return Mono.error(new Exception("token is null!"));
 		}
@@ -50,11 +56,15 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 		if (result == null) {
 			return Mono.error(new NullPointerException("extractToken result = " + result));
 		}
-		RestObject restObject = new Gson().fromJson(result, RestObject.class);
-
-		if (restObject.isSuccess()) {
-			return chain.filter(exchange);
+		try {
+			RestObject restObject = new Gson().fromJson(result, RestObject.class);
+			if (restObject.isSuccess()) {
+				return chain.filter(exchange);
+			}
+		} catch (Exception e) {
+			log.error(result + " exception:" + e);
 		}
+
 		return Mono.error(new Exception(result));
 	}
 
