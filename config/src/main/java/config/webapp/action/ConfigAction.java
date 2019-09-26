@@ -55,6 +55,9 @@ public class ConfigAction {
 		CommonParamDomain domain = new CommonParamDomain();
 		List<CommonParamDomain> typeList = commonParamService.getAllType(a);
 		for (CommonParamDomain dom : typeList) {
+			if("-1".equals(a)){
+				domain.setPageSize(-1);
+			}
 			domain.setType(dom.getType());
 			List<CommonParamDomain> list = commonParamService.findByWhere(domain);
 			dropMap.put(dom.getType(), list);
