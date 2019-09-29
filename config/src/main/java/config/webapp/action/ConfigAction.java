@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.riozenc.titanTool.spring.web.http.HttpResultPagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -37,8 +38,7 @@ public class ConfigAction {
 	@PostMapping("getSysCommConfig")
 	@ResponseBody
 	public Object getCommonParam(@RequestBody CommonParamDomain commonParamDomain) {
-		List<CommonParamDomain> list = commonParamService.findByWhere(commonParamDomain);
-		return list;
+		return new HttpResultPagination(commonParamDomain,commonParamService.findByWhere(commonParamDomain));
 	}
 
 	@PostMapping("findByWhere")
