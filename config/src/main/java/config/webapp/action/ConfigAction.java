@@ -38,7 +38,8 @@ public class ConfigAction {
 	@PostMapping("getSysCommConfig")
 	@ResponseBody
 	public Object getCommonParam(@RequestBody CommonParamDomain commonParamDomain) {
-		return new HttpResultPagination(commonParamDomain,commonParamService.findByWhere(commonParamDomain));
+		return new HttpResultPagination(commonParamDomain,
+				commonParamService.findByWhere(commonParamDomain));
 	}
 
 	@PostMapping("findByWhere")

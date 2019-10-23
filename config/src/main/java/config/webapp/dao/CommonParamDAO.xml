@@ -33,9 +33,6 @@
 			<if test="remark !=null">
 				and REMARK = #{remark}
 			</if>
-			<if test="status !=null">
-				and STATUS = #{status}
-			</if>
 		</where>
 		order by isnull(PARAM_ORDER),PARAM_ORDER
 	</select>
