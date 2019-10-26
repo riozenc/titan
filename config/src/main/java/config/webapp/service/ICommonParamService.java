@@ -11,6 +11,6 @@ public interface ICommonParamService extends BaseService<CommonParamDomain>{
 
     public List<CommonParamDomain> getAllType(String t);
     public List<CommonParamDomain> getAllTypeForList(String t);
-    public List<String> getDistinctRemark();
+    public List<String> getDistinctName();
     public String getCurrentMon() throws Exception;
 }

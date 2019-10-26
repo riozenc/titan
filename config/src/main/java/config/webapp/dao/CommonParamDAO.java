@@ -56,9 +56,9 @@ public class CommonParamDAO extends AbstractTransactionDAOSupport implements Bas
 		return getPersistanceManager().find(getNamespace() + ".getAllTypeForList", t);
 	}
 	//获取不同的备注
-	public List<String> getDistinctRemark() {
+	public List<String> getDistinctName() {
 		// TODO Auto-generated method stub
 		return getPersistanceManager().find(getNamespace() +
-                ".getDistinctRemark", new Object());
+                ".getDistinctName", new Object());
 	}
 }

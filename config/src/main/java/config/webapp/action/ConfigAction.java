@@ -112,7 +112,7 @@ public class ConfigAction {
 	@PostMapping("getDistinctRemark")
 	@ResponseBody
 	public List<String> getDistinctRemark() {
-		return commonParamService.getDistinctRemark();
+		return commonParamService.getDistinctName();
 	}
 
 	private HttpResult insert(CommonParamDomain c) {
