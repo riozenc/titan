@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.riozenc.titanTool.spring.web.http.HttpResultPagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -37,8 +38,8 @@ public class ConfigAction {
 	@PostMapping("getSysCommConfig")
 	@ResponseBody
 	public Object getCommonParam(@RequestBody CommonParamDomain commonParamDomain) {
-		List<CommonParamDomain> list = commonParamService.findByWhere(commonParamDomain);
-		return list;
+		return new HttpResultPagination(commonParamDomain,
+				commonParamService.findByWhere(commonParamDomain));
 	}
 
 	@PostMapping("findByWhere")
@@ -55,6 +56,9 @@ public class ConfigAction {
 		CommonParamDomain domain = new CommonParamDomain();
 		List<CommonParamDomain> typeList = commonParamService.getAllType(a);
 		for (CommonParamDomain dom : typeList) {
+			if("-1".equals(a)){
+				domain.setPageSize(-1);
+			}
 			domain.setType(dom.getType());
 			List<CommonParamDomain> list = commonParamService.findByWhere(domain);
 			dropMap.put(dom.getType(), list);
@@ -108,7 +112,7 @@ public class ConfigAction {
 	@PostMapping("getDistinctRemark")
 	@ResponseBody
 	public List<String> getDistinctRemark() {
-		return commonParamService.getDistinctRemark();
+		return commonParamService.getDistinctName();
 	}
 
 	private HttpResult insert(CommonParamDomain c) {

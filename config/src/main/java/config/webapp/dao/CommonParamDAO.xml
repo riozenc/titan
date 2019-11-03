@@ -3,23 +3,29 @@
 <mapper namespace="config.webapp.dao.CommonParamDAO">
 	<select id="findByKey" parameterType="CommonParamDomain"
 		resultType="CommonParamDomain" useCache="true">
-		select ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS,PARAM_ORDER from
+		select
+		ID,TYPE,PARAM_NAME,PARAM_KEY,PARAM_VALUE,REMARK1,REMARK2,REMARK3,REMARK4,STATUS,PARAM_ORDER
+		from
 		SYSTEM_COMMON_CONFIG
 		<where>
 			and ID = #{id}
 			And STATUS=1
 		</where>
-		order by PARAM_ORDER
+		order by isnull(PARAM_ORDER),PARAM_ORDER
 	</select>
 
 	<select id="findByWhere" parameterType="CommonParamDomain"
 		resultType="CommonParamDomain" useCache="true">
-		select ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS,PARAM_ORDER from
+		select
+		ID,TYPE,PARAM_NAME,PARAM_KEY,PARAM_VALUE,REMARK1,REMARK2,REMARK3,REMARK4,STATUS,PARAM_ORDER from
 		SYSTEM_COMMON_CONFIG
 		<where>
 			And STATUS=1
 			<if test="id !=null">
 				and ID = #{id}
+			</if>
+			<if test="paramName !=null">
+				and PARAM_NAME = #{paramName}
 			</if>
 			<if test="type !=null">
 				and TYPE = #{type}
@@ -30,14 +36,20 @@
 			<if test="paramValue !=null">
 				and PARAM_VALUE = #{paramValue}
 			</if>
-			<if test="remark !=null">
-				and REMARK = #{remark}
+			<if test="remark1 !=null">
+				and REMARK1 = #{remark1}
 			</if>
-			<if test="status !=null">
-				and STATUS = #{status}
+			<if test="remark2 !=null">
+				and REMARK2 = #{remark2}
+			</if>
+			<if test="remark3 !=null">
+				and REMARK3 = #{remark3}
+			</if>
+			<if test="remark4 !=null">
+				and REMARK4 = #{remark4}
 			</if>
 		</where>
-		order by PARAM_ORDER
+		order by isnull(PARAM_ORDER),PARAM_ORDER
 	</select>
 
 	<select id="getAllType" parameterType="CommonParamDomain"
@@ -56,26 +68,40 @@
 		SYSTEM_COMMON_CONFIG
 		where TYPE is not null
 		And STATUS=1
-		ORDER BY SYSTEM_COMMON_CONFIG.TYPE,PARAM_ORDER
+		ORDER BY SYSTEM_COMMON_CONFIG.TYPE,isnull(PARAM_ORDER),PARAM_ORDER
 	</select>
 
 	<insert id="insert" parameterType="CommonParamDomain"
 		flushCache="true">
 		insert into
-		SYSTEM_COMMON_CONFIG(ID,TYPE,PARAM_KEY,PARAM_VALUE,REMARK,STATUS,PARAM_ORDER)
+		SYSTEM_COMMON_CONFIG(ID,TYPE,PARAM_NAME,PARAM_KEY,PARAM_VALUE,REMARK1,REMARK2,REMARK3,REMARK4,STATUS,PARAM_ORDER)
 		values
-		(#{id},#{type},#{paramKey},#{paramValue},#{remark},#{status},#{paramOrder})
+		(#{id},#{type},#{paramName},#{paramKey},#{paramValue},#{remark1},#{remark2},#{remark3},#{remark4},#{status},#{paramOrder})
 	</insert>
 	<update id="update" parameterType="CommonParamDomain"
 		flushCache="true">
 		update SYSTEM_COMMON_CONFIG
 		<set>
-
+			<if test="paramOrder !=null">
+				PARAM_ORDER = #{paramOrder},
+			</if>
+			<if test="paramName !=null">
+				PARAM_NAME = #{paramName},
+			</if>
 			<if test="paramValue !=null">
 				PARAM_VALUE = #{paramValue},
 			</if>
-			<if test="remark !=null">
-				REMARK = #{remark},
+			<if test="remark1 !=null">
+				REMARK1 = #{remark1},
+			</if>
+			<if test="remark2 !=null">
+				REMARK2 = #{remark2},
+			</if>
+			<if test="remark3 !=null">
+				REMARK3 = #{remark3},
+			</if>
+			<if test="remark4 !=null">
+				REMARK4 = #{remark4},
 			</if>
 			<if test="status !=null">
 				STATUS = #{status},
@@ -100,10 +126,10 @@
 		</where>
 	</delete>
 
-	<select id="getDistinctRemark" 	resultType="String"
+	<select id="getDistinctName" 	resultType="String"
 			useCache="true">
 		select
-		distinct REMARK from
+		distinct PARAM_NAME from
 		SYSTEM_COMMON_CONFIG
 	</select>
 </mapper>
