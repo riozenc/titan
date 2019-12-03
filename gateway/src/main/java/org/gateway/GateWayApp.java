@@ -1,11 +1,13 @@
 package org.gateway;
 
 import org.gateway.custom.context.SpringContextHolder;
+import org.gateway.filter.ApiFilter;
 import org.gateway.filter.BemServerFilter;
 import org.gateway.filter.BillingServerFilter;
 import org.gateway.filter.CfsFilter;
 import org.gateway.filter.CimServerFilter;
 import org.gateway.filter.PreGatewayFilter;
+import org.gateway.filter.ReportServerFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -164,9 +166,10 @@ public class GateWayApp {
 	 */
 	@Bean
 	public RouteLocator reportRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
-		return routeLocatorBuilder
-				.routes().route(r -> r.path("/report/**")
-						.filters(f -> f.filter(SpringContextHolder.getBean(CfsFilter.class))).uri("lb://TITAN-REPORT/"))
+		return routeLocatorBuilder.routes()
+				.route(r -> r.path("/report/**")
+						.filters(f -> f.filter(SpringContextHolder.getBean(ReportServerFilter.class)))
+						.uri("lb://TITAN-REPORT/"))
 				.build();
 	}
 
@@ -180,7 +183,7 @@ public class GateWayApp {
 	public RouteLocator apiRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		return routeLocatorBuilder
 				.routes().route(r -> r.path("/api/**")
-						.filters(f -> f.filter(SpringContextHolder.getBean(CfsFilter.class))).uri("lb://TITAN-API/"))
+						.filters(f -> f.filter(SpringContextHolder.getBean(ApiFilter.class))).uri("lb://TITAN-API/"))
 				.build();
 	}
 
