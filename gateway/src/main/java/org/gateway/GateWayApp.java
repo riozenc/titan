@@ -143,11 +143,45 @@ public class GateWayApp {
 
 	}
 
+	/**
+	 * 算费服务
+	 * 
+	 * @param routeLocatorBuilder
+	 * @return
+	 */
 	@Bean
 	public RouteLocator cfsRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		return routeLocatorBuilder.routes().route(r -> r.path("/cfs/**")
 				.filters(f -> f.filter(SpringContextHolder.getBean(CfsFilter.class))).uri("lb://CFS/")).build();
 
+	}
+
+	/**
+	 * 报表服务
+	 * 
+	 * @param routeLocatorBuilder
+	 * @return
+	 */
+	@Bean
+	public RouteLocator reportRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
+		return routeLocatorBuilder
+				.routes().route(r -> r.path("/report/**")
+						.filters(f -> f.filter(SpringContextHolder.getBean(CfsFilter.class))).uri("lb://TITAN-REPORT/"))
+				.build();
+	}
+
+	/**
+	 * 三方接口服务
+	 * 
+	 * @param routeLocatorBuilder
+	 * @return
+	 */
+	@Bean
+	public RouteLocator apiRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
+		return routeLocatorBuilder
+				.routes().route(r -> r.path("/api/**")
+						.filters(f -> f.filter(SpringContextHolder.getBean(CfsFilter.class))).uri("lb://TITAN-API/"))
+				.build();
 	}
 
 }
