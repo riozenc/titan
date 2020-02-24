@@ -56,7 +56,7 @@ public class GateWayApp {
 	public RouteLocator authRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		Builder builder = routeLocatorBuilder.routes();
 		Builder asyncBuilder = builder.route(
-				r -> r.path("/auth/**/{seg}").filters(f -> f.filter(new PreGatewayFilter())).uri("lb://AUTH-CENTER/"));
+				r -> r.path("/auth/**").filters(f -> f.filter(new PreGatewayFilter())).uri("lb://AUTH-CENTER/"));
 		// StripPrefix
 		RouteLocator routeLocator = asyncBuilder.build();
 		return routeLocator;
@@ -72,7 +72,7 @@ public class GateWayApp {
 	public RouteLocator authDataRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		Builder builder = routeLocatorBuilder.routes();
 		Builder asyncBuilder = builder.route(
-				r -> r.path("/auth-data/**").filters(f -> f.filter(new PreGatewayFilter())).uri("lb://AUTH-DATA/"));
+				r -> r.path("/auth-data/**").filters(f -> f.filter(new PreGatewayFilter())).uri("lb://AUTH-CENTER/"));
 		RouteLocator routeLocator = asyncBuilder.build();
 		return routeLocator;
 	}

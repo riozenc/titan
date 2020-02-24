@@ -95,7 +95,7 @@ public class AuthorizationHandler {
 		requestHeaders.add(HEARDS_TOKEN, token);
 		HttpEntity<String> requestEntity = new HttpEntity<String>(null, requestHeaders);
 
-		ResponseEntity<String> responseEntity = restTemplate.exchange("http://AUTH-DATA/auth-data/role/auth/table",
+		ResponseEntity<String> responseEntity = restTemplate.exchange("http://AUTH-CENTER/auth/role/auth/table",
 				HttpMethod.GET, requestEntity, String.class);
 
 		RestObject restObject = new Gson().fromJson(responseEntity.getBody(), RestObject.class);
@@ -123,7 +123,7 @@ public class AuthorizationHandler {
 		requestHeaders.add(HEARDS_TOKEN, token);
 		HttpEntity<String> requestEntity = new HttpEntity<String>(null, requestHeaders);
 
-		ResponseEntity<String> responseEntity = restTemplate.exchange("http://AUTH-DATA/auth-data/dept/auth/table",
+		ResponseEntity<String> responseEntity = restTemplate.exchange("http://AUTH-CENTER/auth/dept/auth/table",
 				HttpMethod.GET, requestEntity, String.class);
 
 		RestObject restObject = new Gson().fromJson(responseEntity.getBody(), RestObject.class);
