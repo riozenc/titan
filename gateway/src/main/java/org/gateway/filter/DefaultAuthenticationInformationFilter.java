@@ -14,19 +14,16 @@ public class DefaultAuthenticationInformationFilter implements AuthenticationInf
 
 	@Override
 	public String getUserId(String token) throws Exception {
-		// TODO Auto-generated method stub
 		return authorizationHandler.getUser(token);
 	}
 
 	@Override
 	public String getRoleIds(String token) throws Exception {
-		// TODO Auto-generated method stub
 		return authorizationHandler.getRoles(token);
 	}
 
 	@Override
 	public String getDeptIds(String token) throws Exception {
-		// TODO Auto-generated method stub
 		return authorizationHandler.getDepts(token);
 	}
 

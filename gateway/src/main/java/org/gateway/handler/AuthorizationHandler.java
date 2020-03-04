@@ -64,6 +64,8 @@ public class AuthorizationHandler {
 				requestBody, httpHeaders);
 
 		String result = restTemplate.postForObject("http://AUTH-CENTER/auth/oauth/token", requestEntity, String.class);
+		
+		
 
 		return result;
 	}
@@ -76,7 +78,7 @@ public class AuthorizationHandler {
 		String result = restTemplate.getForObject("http://AUTH-CENTER/auth/extractToken?token=" + token, String.class);
 		RestObject restObject = new Gson().fromJson(result, RestObject.class);
 		if (!restObject.isSuccess()) {
-			throw new Exception(new Exception(restObject.getMessage()));
+			throw new Exception(result);
 		}
 
 		UserInfo userInfo = new Gson().fromJson(restObject.getData(), UserInfo.class);

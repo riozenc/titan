@@ -72,6 +72,7 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 		if (uri.getPath().contains("static")) {
 			return true;
 		}
+
 		return false;
 	}
 

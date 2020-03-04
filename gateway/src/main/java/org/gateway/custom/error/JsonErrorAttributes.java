@@ -60,6 +60,7 @@ public class JsonErrorAttributes implements ErrorAttributes {
 	}
 
 	private HttpStatus determineHttpStatus(Throwable error) {
+
 		if (error instanceof ResponseStatusException) {
 			return ((ResponseStatusException) error).getStatus();
 		}
@@ -68,6 +69,7 @@ public class JsonErrorAttributes implements ErrorAttributes {
 		if (responseStatus != null) {
 			return responseStatus.code();
 		}
+
 		return HttpStatus.INTERNAL_SERVER_ERROR;
 	}
 
