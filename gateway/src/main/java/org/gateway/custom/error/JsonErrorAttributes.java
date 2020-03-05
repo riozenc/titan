@@ -11,10 +11,12 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.gateway.handler.AuthorizationHandler.RestObject;
 import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.support.WebExchangeBindException;
@@ -51,15 +53,27 @@ public class JsonErrorAttributes implements ErrorAttributes {
 		errorAttributes.put("timestamp", new Date());
 		errorAttributes.put("path", request.path());
 		Throwable error = getError(request);
+
 		HttpStatus errorStatus = determineHttpStatus(error);
 		errorAttributes.put("status", errorStatus.value());
 		errorAttributes.put("error", errorStatus.getReasonPhrase());
+
 		errorAttributes.put("message", determineMessage(error));
 		handleException(errorAttributes, determineException(error), includeStackTrace);
 		return errorAttributes;
 	}
 
 	private HttpStatus determineHttpStatus(Throwable error) {
+
+		try {
+			RestObject restObject = GsonBuilderUtils.gsonBuilderWithBase64EncodedByteArrays().create()
+					.fromJson(error.getMessage(), RestObject.class);
+			if (restObject != null) {
+				return HttpStatus.valueOf(restObject.getStatus());
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		if (error instanceof ResponseStatusException) {
 			return ((ResponseStatusException) error).getStatus();
