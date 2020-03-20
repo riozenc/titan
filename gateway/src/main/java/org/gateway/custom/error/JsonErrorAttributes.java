@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.gateway.custom.exception.annotation.HttpStatusAnnotation;
+import org.gateway.custom.utils.AnnotationUtils;
 import org.gateway.handler.AuthorizationHandler.RestObject;
 import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
@@ -65,6 +67,11 @@ public class JsonErrorAttributes implements ErrorAttributes {
 
 	private HttpStatus determineHttpStatus(Throwable error) {
 
+		Object status = AnnotationUtils.getAnnotationValue(error.getClass(), HttpStatusAnnotation.class);
+
+		if (null != status) {
+			return HttpStatus.valueOf((int) status);
+		}
 		try {
 			RestObject restObject = GsonBuilderUtils.gsonBuilderWithBase64EncodedByteArrays().create()
 					.fromJson(error.getMessage(), RestObject.class);
