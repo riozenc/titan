@@ -39,8 +39,6 @@ public class BillingServerFilter extends DefaultAuthenticationInformationFilter 
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-		// TODO Auto-generated method stub
-
 		String token = exchange.getRequest().getHeaders().getFirst(AuthorizationHandler.HEARDS_TOKEN);
 		ServerRequest serverRequest = new DefaultServerRequest(exchange);
 		try {
