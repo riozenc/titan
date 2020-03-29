@@ -1,23 +1,18 @@
-server:
- port: 9922
 spring:
  application:
   name: gateway
  cloud:
-  gateway:
+  config:
+   profile: dev
+   label: master
    discovery:
-    locator:
-     enabled: true
+    enabled: true
+    service-id: config-center
 eureka:
   instance: 
+    appGroupName: GATEWAY
     prefer-ip-address: true
     #ip-address: 172.21.29.75
   client:
     serviceUrl:
-      defaultZone: http://172.21.29.55:7777/eureka/
-      #defaultZone: http://172.20.100.29:7777/eureka/
-logging:
-  level:
-    org.gateway: debug
-    org.springframework.cloud.gateway: debug
-  path: log
+      defaultZone: http://czy:123456@172.21.29.75:7777/eureka/

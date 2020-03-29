@@ -8,6 +8,10 @@ package org.gateway.exception.handler;
 import static org.springframework.web.reactive.function.server.RequestPredicates.all;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -22,13 +26,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RequestPredicate;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -40,11 +44,21 @@ import reactor.core.publisher.Mono;
 
 public class JsonExceptionHandler extends DefaultErrorWebExceptionHandler {
 	private static final Log logger = LogFactory.getLog(JsonExceptionHandler.class);
+	private static final MediaType TEXT_HTML_UTF8 = new MediaType("text", "html", StandardCharsets.UTF_8);
+	private static final Map<HttpStatus.Series, String> SERIES_VIEWS;
+	private final ErrorProperties errorProperties;
+
+	static {
+		Map<HttpStatus.Series, String> views = new EnumMap<>(HttpStatus.Series.class);
+		views.put(HttpStatus.Series.CLIENT_ERROR, "4xx");
+		views.put(HttpStatus.Series.SERVER_ERROR, "5xx");
+		SERIES_VIEWS = Collections.unmodifiableMap(views);
+	}
 
 	public JsonExceptionHandler(ErrorAttributes errorAttributes, ResourceProperties resourceProperties,
 			ErrorProperties errorProperties, ApplicationContext applicationContext) {
 		super(errorAttributes, resourceProperties, errorProperties, applicationContext);
-		// TODO Auto-generated constructor stub
+		this.errorProperties = errorProperties;
 	}
 
 	@Override
@@ -60,11 +74,16 @@ public class JsonExceptionHandler extends DefaultErrorWebExceptionHandler {
 	 * @return a {@code Publisher} of the HTTP response
 	 */
 	protected Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
-		boolean includeStackTrace = isIncludeStackTrace(request, MediaType.ALL);
+		boolean includeStackTrace = isIncludeStackTrace(request, MediaType.TEXT_HTML);
 		Map<String, Object> error = getErrorAttributes(request, includeStackTrace);
-		HttpStatus errorStatus = getHttpStatus(error);
-		return ServerResponse.status(getHttpStatus(error)).contentType(MediaType.APPLICATION_JSON_UTF8)
-				.body(BodyInserters.fromObject(error)).doOnNext((resp) -> logError(request, errorStatus));
+		int errorStatus = getHttpStatus(error);
+		ServerResponse.BodyBuilder responseBody = ServerResponse.status(errorStatus).contentType(TEXT_HTML_UTF8);
+		return Flux.just(getData(errorStatus).toArray(new String[] {}))
+				.flatMap((viewName) -> renderErrorView(viewName, responseBody, error))
+				.switchIfEmpty(
+						this.errorProperties.getWhitelabel().isEnabled() ? renderDefaultErrorView(responseBody, error)
+								: Mono.error(getError(request)))
+				.next();
 	}
 
 	/**
@@ -73,9 +92,9 @@ public class JsonExceptionHandler extends DefaultErrorWebExceptionHandler {
 	 * @param errorAttributes the current error information
 	 * @return the error HTTP status
 	 */
-	protected HttpStatus getHttpStatus(Map<String, Object> errorAttributes) {
+	protected int getHttpStatus(Map<String, Object> errorAttributes) {
 		int statusCode = (int) errorAttributes.get("status");
-		return HttpStatus.valueOf(statusCode);
+		return statusCode;
 	}
 
 	/**
@@ -132,4 +151,14 @@ public class JsonExceptionHandler extends DefaultErrorWebExceptionHandler {
 		return message.toString();
 	}
 
+	private List<String> getData(int errorStatus) {
+		List<String> data = new ArrayList<>();
+		data.add("error/" + errorStatus);
+		HttpStatus.Series series = HttpStatus.Series.resolve(errorStatus);
+		if (series != null) {
+			data.add("error/" + SERIES_VIEWS.get(series));
+		}
+		data.add("error/error");
+		return data;
+	}
 }

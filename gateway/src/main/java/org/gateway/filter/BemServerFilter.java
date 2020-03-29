@@ -10,8 +10,8 @@ import org.apache.commons.logging.LogFactory;
 import org.gateway.handler.AuthorizationHandler;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.factory.rewrite.CachedBodyOutputMessage;
 import org.springframework.cloud.gateway.support.BodyInserterContext;
-import org.springframework.cloud.gateway.support.CachedBodyOutputMessage;
 import org.springframework.cloud.gateway.support.DefaultServerRequest;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
@@ -40,6 +40,7 @@ public class BemServerFilter extends DefaultAuthenticationInformationFilter impl
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 		String token = exchange.getRequest().getHeaders().getFirst(AuthorizationHandler.HEARDS_TOKEN);
 		ServerRequest serverRequest = new DefaultServerRequest(exchange);
+
 		try {
 			String managerId = super.getUserId(token);
 			String roleIds = super.getRoleIds(token);
@@ -106,8 +107,6 @@ public class BemServerFilter extends DefaultAuthenticationInformationFilter impl
 			return tamperWithForm(body, managerId, roleIds, deptIds);
 		}
 	}
-
-
 
 	private String tamperWithJson(String body, String userId, String roleIds, String deptIds) {
 		Gson gson = new Gson();
