@@ -72,7 +72,7 @@ public class JsonErrorAttributes implements ErrorAttributes {
 				return HttpStatus.valueOf(restObject.getStatus());
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			
 		}
 
 		if (error instanceof ResponseStatusException) {

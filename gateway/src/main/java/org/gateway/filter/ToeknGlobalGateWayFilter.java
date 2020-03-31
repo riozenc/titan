@@ -33,39 +33,40 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-		// TODO Auto-generated method stub
 
-		if (isStaticResources(exchange.getRequest().getURI())) {
-			return chain.filter(exchange);
-		}
 
-		HttpHeaders httpHeaders = exchange.getRequest().getHeaders();
-
-		String token = httpHeaders.getFirst(AuthorizationHandler.HEARDS_TOKEN);
-
-		if (log.isDebugEnabled()) {
-			log.info(token);
-		}
-
-		if (null == token) {
-			return Mono.error(new Exception("token is null!"));
-		}
-
-		// 认证校验
-		String result = restTemplate.getForObject("http://AUTH-CENTER/auth/extractToken?token=" + token, String.class);
-		if (result == null) {
-			return Mono.error(new NullPointerException("extractToken result = " + result));
-		}
-		try {
-			RestObject restObject = new Gson().fromJson(result, RestObject.class);
-			if (restObject.isSuccess()) {
-				return chain.filter(exchange);
-			}
-		} catch (Exception e) {
-			log.error(result + " exception:" + e);
-		}
-
-		return Mono.error(new Exception(result));
+		return chain.filter(exchange);
+//		if (isStaticResources(exchange.getRequest().getURI())) {
+//			return chain.filter(exchange);
+//		}
+//
+//		HttpHeaders httpHeaders = exchange.getRequest().getHeaders();
+//
+//		String token = httpHeaders.getFirst(AuthorizationHandler.HEARDS_TOKEN);
+//
+//		if (log.isDebugEnabled()) {
+//			log.info(token);
+//		}
+//
+//		if (null == token) {
+//			return Mono.error(new Exception("token is null!"));
+//		}
+//
+//		// 认证校验
+//		String result = restTemplate.getForObject("http://AUTH-CENTER/auth/extractToken?token=" + token, String.class);
+//		if (result == null) {
+//			return Mono.error(new NullPointerException("extractToken result = " + result));
+//		}
+//		try {
+//			RestObject restObject = new Gson().fromJson(result, RestObject.class);
+//			if (restObject.isSuccess()) {
+//				return chain.filter(exchange);
+//			}
+//		} catch (Exception e) {
+//			log.error(result + " exception:" + e);
+//		}
+//
+//		return Mono.error(new Exception(result));
 	}
 
 	public boolean isStaticResources(URI uri) {
