@@ -4,23 +4,27 @@
  * Title : org.rs.listener.EurekaInstanceEventListener.java
  *
 **/
-package org.rs.listener;
+package org.rs.event;
 
 import static java.util.Collections.synchronizedMap;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.rs.listener.handler.RegisteredEventHandler;
 import org.springframework.cloud.netflix.eureka.server.event.EurekaInstanceCanceledEvent;
 import org.springframework.cloud.netflix.eureka.server.event.EurekaInstanceRegisteredEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.netflix.appinfo.InstanceInfo;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 
 @Component
 public class EurekaInstanceEventListener {
+
+	private static final long WAITING_TIME = 10000;
 
 	private RegisteredEventHandler registeredEventHandler;
 
@@ -32,18 +36,14 @@ public class EurekaInstanceEventListener {
 	}
 
 	@EventListener
-	public void registered(EurekaInstanceRegisteredEvent event) throws InterruptedException {
-
+	public void registered(EurekaInstanceRegisteredEvent event)
+			throws InterruptedException, UniformInterfaceException, ClientHandlerException, JsonProcessingException {
 		InstanceInfo info = event.getInstanceInfo();
-
-		System.out.println(info);
-
 		while (true) {
 			synchronized (gateways) {
-
 				if (isBusinessServiceGroup(info.getAppGroupName())) {
 					if (this.gateways.size() == 0) {
-						gateways.wait(5000);
+						gateways.wait(WAITING_TIME);
 					} else {
 						this.registeredEventHandler.execute(gateways.values(), info);
 						return;
@@ -55,21 +55,15 @@ public class EurekaInstanceEventListener {
 					}
 					return;
 				}
-
 			}
-
 		}
-
 	}
 
 	@EventListener
 	public void canceled(EurekaInstanceCanceledEvent event) {
-
 		if (gateways.keySet().contains(event.getServerId())) {
 			gateways.remove(event.getServerId());
 		}
-
-		System.out.println(event.getAppName() + " canceled");
 	}
 
 	private boolean isGateWay(String appName) {

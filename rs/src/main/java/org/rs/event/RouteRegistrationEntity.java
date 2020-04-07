@@ -1,21 +1,19 @@
 /**
  * Author : chizf
  * Date : 2020年3月30日 下午3:41:23
- * Title : org.rs.event.GateWayRegisteredEntity.java
+ * Title : org.rs.event.RouteRegistrationEntity.java
  *
 **/
-package org.gateway.handler.entity;
+package org.rs.event;
 
-public class RegistrationGatewayEntity {
+public class RouteRegistrationEntity {
 	private String id;
 	private int order;
 	private String uri;
 	private String filters;
 
 	private String appName;
-	/**
-	 * [{ "args": { "_genkey_0": "/demoApi/**" }, "name": "Path" }]
-	 */
+
 	private String predicates;
 
 	public String getId() {

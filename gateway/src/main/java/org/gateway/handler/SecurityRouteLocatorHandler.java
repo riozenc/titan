@@ -7,9 +7,8 @@
 package org.gateway.handler;
 
 import java.net.URI;
-import java.util.Arrays;
 
-import org.gateway.handler.entity.RegistrationGatewayEntity;
+import org.gateway.handler.entity.RouteRegistrationEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.event.RefreshRoutesEvent;
 import org.springframework.cloud.gateway.filter.FilterDefinition;
@@ -37,50 +36,26 @@ public class SecurityRouteLocatorHandler implements ApplicationEventPublisherAwa
 	@Autowired
 	private RouteDefinitionWriter routeDefinitionWriter;
 
-	@RequestMapping(params = "method=add")
+	@RequestMapping(params = "method=saveRoute")
 	@ResponseBody
-	public String add() {
+	public Object saveRoute(@RequestBody RouteRegistrationEntity routeRegistrationEntity) {
 
 		RouteDefinition routeDefinition = new RouteDefinition();
-		FilterDefinition filterDefinition = new FilterDefinition();
-		filterDefinition.setName("TestFactory");
-		filterDefinition.addArg("regexp", "/CONFIG-CLIENT/(?<remaining>.*)");
-		filterDefinition.addArg("replacement", "/${remaining}");
-
-		PredicateDefinition predicateDefinition = new PredicateDefinition("Path=/config-client/**");
-
-		routeDefinition.setId("asdc");
-		routeDefinition.setFilters(Arrays.asList(filterDefinition));
-		routeDefinition.setOrder(1);
-		routeDefinition.setPredicates(Arrays.asList(predicateDefinition));
-		routeDefinition.setUri(URI.create("lb://CONFIG-CLIENT/"));
-
-		routeDefinitionWriter.save(Mono.just(routeDefinition)).subscribe();
-		notifyChanged();// 发布事件
-		return "success";
-	}
-
-	@RequestMapping(params = "method=add1")
-	@ResponseBody
-	public Object add1(@RequestBody RegistrationGatewayEntity registrationGatewayEntity) {
-
-		RouteDefinition routeDefinition = new RouteDefinition();
-		for (String filter : registrationGatewayEntity.getFilters().split(",")) {
+		for (String filter : routeRegistrationEntity.getFilters().split(",")) {
 			FilterDefinition filterDefinition = new FilterDefinition();
 			filterDefinition.setName(filter);// ***关键，需要匹配gatewayFilterFactory里的类
-			filterDefinition.addArg("regexp",
-					"/" + registrationGatewayEntity.getAppName().toUpperCase() + REGEXP_STRING);// "/CONFIG-CLIENT"
+			filterDefinition.addArg("regexp", "/" + routeRegistrationEntity.getAppName().toUpperCase() + REGEXP_STRING);// "/CONFIG-CLIENT"
 			filterDefinition.addArg("replacement", REPLACEMENT_STRING);
 			routeDefinition.getFilters().add(filterDefinition);
 		}
 
 		// Path=/config-client/**
-		PredicateDefinition definition = new PredicateDefinition("Path=" + registrationGatewayEntity.getPredicates());
+		PredicateDefinition definition = new PredicateDefinition("Path=" + routeRegistrationEntity.getPredicates());
 		routeDefinition.getPredicates().add(definition);
 
-		routeDefinition.setId(registrationGatewayEntity.getId());
-		routeDefinition.setOrder(registrationGatewayEntity.getOrder());
-		routeDefinition.setUri(URI.create(registrationGatewayEntity.getUri()));
+		routeDefinition.setId(routeRegistrationEntity.getId());
+		routeDefinition.setOrder(routeRegistrationEntity.getOrder());
+		routeDefinition.setUri(URI.create(routeRegistrationEntity.getUri()));
 
 		routeDefinitionWriter.save(Mono.just(routeDefinition)).subscribe();
 		notifyChanged();// 发布事件
@@ -94,12 +69,6 @@ public class SecurityRouteLocatorHandler implements ApplicationEventPublisherAwa
 	@Override
 	public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
 		this.publisher = applicationEventPublisher;
-	}
-
-	public static void main(String[] args) {
-		String s = "czy=http://localhost:8888,path=/u,path=/a";
-		RouteDefinition routeDefinition = new RouteDefinition(s);
-		System.out.println(s);
 	}
 
 }

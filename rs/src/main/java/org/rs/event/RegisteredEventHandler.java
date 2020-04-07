@@ -4,7 +4,7 @@
  * Title : org.rs.listener.handler.RegisteredEventHandler.java
  *
 **/
-package org.rs.listener.handler;
+package org.rs.event;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -13,68 +13,79 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.appinfo.InstanceInfo;
-import com.netflix.discovery.DiscoveryClient;
-import com.netflix.discovery.EurekaClient;
 import com.netflix.discovery.shared.transport.EurekaHttpResponse;
 import com.netflix.discovery.shared.transport.EurekaHttpResponse.EurekaHttpResponseBuilder;
 import com.netflix.discovery.shared.transport.TransportException;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource.Builder;
 
 @Component
 public class RegisteredEventHandler {
 	private static final Logger logger = LoggerFactory.getLogger(RegisteredEventHandler.class);
 
-	protected final Client jerseyClient = Client.create();
-
 	private final int numberOfRetries = 3;
 
-	public EurekaHttpResponse<Void> execute(Collection<InstanceInfo> gateways, InstanceInfo info) {
-		
-//		http://172.21.29.75:9922/securityRouteLocator?method=add
+	private final Client client = Client.create();
+
+	public EurekaHttpResponse<Void> execute(Collection<InstanceInfo> gateways, InstanceInfo info)
+			throws UniformInterfaceException, ClientHandlerException, JsonProcessingException {
 
 		for (int retry = 0; retry < numberOfRetries; retry++) {
-			
-			
-
 			for (InstanceInfo gatewayInfo : gateways) {
-				String serviceUri = "http://" + gatewayInfo.getIPAddr() + ":" + gatewayInfo.getPort() + "/";
-				String urlPath = "securityRouteLocator?method=add";
-				ClientResponse response = null;
-				try {
+				logger.debug("try register {} to {} - numberOfRetries : {} ", info.getAppName(),
+						gatewayInfo.getIPAddr(), retry);
 
-					
+				WebResource webResource = client.resource(gatewayInfo.getHomePageUrl()).path("securityRouteLocator")
+						.queryParam("method", "saveRoute");
 
-					response = builder.header("Accept-Encoding", "gzip").accept(MediaType.APPLICATION_JSON)
-							.post(Entity.entity(info, MediaType.APPLICATION_JSON), ClientResponse.class);
+				Builder requestBuilder = webResource.getRequestBuilder().header("Accept-Encoding", "gzip")
+						.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON_TYPE);
 
+				ClientResponse response = requestBuilder.post(ClientResponse.class,
+						new ObjectMapper().writeValueAsString(createEntity(info)));
+
+				String result = response.getEntity(String.class);
+				if (response.getStatus() == Status.OK.getStatusCode() && response.hasEntity()) {
+					logger.debug("Registered [{}] {} to {} - response : {} ", response.getStatus(), info.getAppName(),
+							gatewayInfo.getIPAddr(), result);
 					return anEurekaHttpResponse(response.getStatus()).headers(headersOf(response)).build();
-				} catch (Exception e) {
-					e.printStackTrace();
-					logger.debug("{} gateway is error,change next gateway", gatewayInfo.getAppName());
-				} finally {
-					if (logger.isDebugEnabled()) {
-						logger.debug("Jersey HTTP POST {}/{} with instance {}; statusCode={}", "gateway", urlPath,
-								info.getId(), response == null ? "N/A" : response.getStatus());
-					}
-					if (response != null) {
-						response.close();
-					}
+				} else {
+					logger.debug("Registered [{}] {} to {} - response : {} ", response.getStatus(), info.getAppName(),
+							gatewayInfo.getIPAddr(), result);
 				}
+
 			}
 
 		}
 		throw new TransportException("Retry limit reached; giving up on completing the request");
+	}
+
+	private RouteRegistrationEntity createEntity(InstanceInfo instanceInfo) {
+		RouteRegistrationEntity entity = new RouteRegistrationEntity();
+		entity.setId(instanceInfo.getId());
+		entity.setAppName(instanceInfo.getAppName());
+		entity.setOrder(instanceInfo.hashCode());
+		entity.setUri("lb://" + instanceInfo.getAppName().toUpperCase() + "/");
+		entity.setFilters(instanceInfo.getMetadata().get("filters"));
+		entity.setPredicates(instanceInfo.getMetadata().get("predicates") == null
+				? "/" + instanceInfo.getAppName().toLowerCase() + "/**"
+				: instanceInfo.getMetadata().get("predicates"));
+		return entity;
 	}
 
 	private static Map<String, String> headersOf(ClientResponse response) {
