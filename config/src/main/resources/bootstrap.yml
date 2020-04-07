@@ -1,10 +1,17 @@
 server:
  port: 11111
  servlet:
-  context-path: /titan-config
+  context-path: /config-center
 spring:
  application:
-  name: titan-config
+  name: config-center
+ profiles:
+  active: native
+ cloud:
+  config:
+   server:
+    native:
+     searchLocations: classpath:/serverConfig
  servlet:
     multipart:
       max-file-size: 100MB
@@ -17,10 +24,10 @@ eureka:
   instance: 
     prefer-ip-address: true
     #ip-address: 172.21.29.75
+    appGroupName: COMMON
   client:
     serviceUrl:
-      defaultZone: http://172.21.29.55:7777/eureka/
-      #defaultZone: http://10.1.0.192:7777/eureka/
+      defaultZone: http://titan:df6100@172.21.29.55:7777/eureka/
 logging:
   level:
     config: debug
