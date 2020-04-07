@@ -23,8 +23,9 @@ spring:
 eureka:
   instance: 
     prefer-ip-address: true
-    #ip-address: 172.21.29.75
     appGroupName: COMMON
+    metadata-map:
+     configPath: ${server.servlet.context-path:}
   client:
     serviceUrl:
       defaultZone: http://titan:df6100@172.21.29.55:7777/eureka/
