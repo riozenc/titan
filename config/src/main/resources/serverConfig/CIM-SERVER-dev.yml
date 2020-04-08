@@ -1,8 +1,8 @@
 server:
- port: 9922
+ port: 10077
+ servlet:
+  context-path: /cimServer
 spring:
-# application:
-#  name: gateway
  cloud:
   gateway:
    discovery:
@@ -10,6 +10,5 @@ spring:
      enabled: true
 logging:
   level:
-    org.gateway: debug
-    org.springframework.cloud.gateway: debug
+    org.riozenc.cim: debug
   path: log
