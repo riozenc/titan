@@ -63,9 +63,7 @@ public class AuthorizationHandler {
 		HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<MultiValueMap<String, String>>(
 				requestBody, httpHeaders);
 
-		String result = restTemplate.postForObject("http://AUTH-CENTER/auth/oauth/token", requestEntity, String.class);
-		
-		
+		String result = restTemplate.postForObject("http://AUTH/auth/oauth/token", requestEntity, String.class);
 
 		return result;
 	}
@@ -75,7 +73,7 @@ public class AuthorizationHandler {
 	public String getUser(String token) throws Exception {
 //		String token = "bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2luZm8iOnsiaWQiOjEsInVzZXJJZCI6InN5c2FkbWluIiwidXNlck5hbWUiOiLns7vnu5_nrqHnkIblkZgiLCJwYXNzd29yZCI6bnVsbCwicGhvbmUiOiIxNTExMjM0NTY3OCIsInNleCI6bnVsbCwic3RhdHVzIjoxLCJtYWlsQWRkcmVzcyI6bnVsbCwiaW1hZ2VVcmwiOm51bGwsInJlbWFyayI6bnVsbCwiY3JlYXRlRGF0ZSI6MTU0ODIxMDg0MDAwMCwidXBkYXRlRGF0ZSI6MTU1MDY0NDQzNTAwMH0sInVzZXJfbmFtZSI6Iuezu-e7n-euoeeQhuWRmCIsInNjb3BlIjpbInVzZXIiXSwiZXhwIjoxNTUxMzgyNjYyLCJhdXRob3JpdGllcyI6WyIxIl0sImp0aSI6IjJiNzc2OWJiLTkyYWItNDYzMy04ZmQ5LTkwNDg4YmExZmQyMyIsImNsaWVudF9pZCI6InRlc3QifQ.CK-7n5-sbj52jv2FWoLwv8VUYAQEYq9ZLouh64C-1sCc0DSgu0futtZnffRJry7i4a6_8oQBcvhGhIbzwcadiOC5yqbR28_kN79Zq8pS8rXttIFVZs2A1RYEhZvLcCz3nF2u5gV1NWJUhDuzW62V7Rywlk-fndR04iaQBFCVnvbT1UVjlFOkq1gDRV4mUk_WIQ_IRLaULUZiv-xqDjOxyyPDMW0L3vXCp-qyN2weDQdFZZ7ohDcihy4FUMsa4ySCylGxbLQjrf3Kg83jzxk2spc0npgmSjfvVJwaxo2UJQ8H46P3oZKp0WqyP9-OCiYiQoqiXxqHbjyqGyCZh5LtsA";
 
-		String result = restTemplate.getForObject("http://AUTH-CENTER/auth/extractToken?token=" + token, String.class);
+		String result = restTemplate.getForObject("http://AUTH/auth/extractToken?token=" + token, String.class);
 		RestObject restObject = new Gson().fromJson(result, RestObject.class);
 		if (!restObject.isSuccess()) {
 			throw new Exception(result);
@@ -97,7 +95,7 @@ public class AuthorizationHandler {
 		requestHeaders.add(HEARDS_TOKEN, token);
 		HttpEntity<String> requestEntity = new HttpEntity<String>(null, requestHeaders);
 
-		ResponseEntity<String> responseEntity = restTemplate.exchange("http://AUTH-CENTER/auth/role/auth/table",
+		ResponseEntity<String> responseEntity = restTemplate.exchange("http://AUTH/auth/role/auth/table",
 				HttpMethod.GET, requestEntity, String.class);
 
 		RestObject restObject = new Gson().fromJson(responseEntity.getBody(), RestObject.class);
@@ -125,7 +123,7 @@ public class AuthorizationHandler {
 		requestHeaders.add(HEARDS_TOKEN, token);
 		HttpEntity<String> requestEntity = new HttpEntity<String>(null, requestHeaders);
 
-		ResponseEntity<String> responseEntity = restTemplate.exchange("http://AUTH-CENTER/auth/dept/auth/table",
+		ResponseEntity<String> responseEntity = restTemplate.exchange("http://AUTH/auth/dept/auth/table",
 				HttpMethod.GET, requestEntity, String.class);
 
 		RestObject restObject = new Gson().fromJson(responseEntity.getBody(), RestObject.class);

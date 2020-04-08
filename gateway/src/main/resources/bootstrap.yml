@@ -12,7 +12,6 @@ eureka:
   instance: 
     appGroupName: GATEWAY
     prefer-ip-address: true
-    #ip-address: 172.21.29.75
   client:
     serviceUrl:
-      defaultZone: http://czy:123456@172.21.29.75:7777/eureka/
+      defaultZone: http://titan:df6100@172.21.29.55:7777/eureka/
