@@ -64,8 +64,6 @@ public class AuthorizationHandler {
 				requestBody, httpHeaders);
 
 		String result = restTemplate.postForObject("http://AUTH-CENTER/auth/oauth/token", requestEntity, String.class);
-		
-		
 
 		return result;
 	}
@@ -81,7 +79,7 @@ public class AuthorizationHandler {
 			throw new Exception(result);
 		}
 
-		UserInfo userInfo = new Gson().fromJson(restObject.getData(), UserInfo.class);
+		UserInfo userInfo = new Gson().fromJson(restObject.getResultData(), UserInfo.class);
 
 		return userInfo.getId().toString();
 	}
@@ -107,7 +105,7 @@ public class AuthorizationHandler {
 		}
 
 		Set<String> roleIdList = new HashSet<>();
-		restObject.getData().getAsJsonArray().forEach(json -> {
+		restObject.getResultData().getAsJsonArray().forEach(json -> {
 			roleIdList.add(json.getAsJsonObject().get("id").getAsString());
 		});
 
@@ -135,7 +133,7 @@ public class AuthorizationHandler {
 		}
 
 		Set<String> deptIdList = new HashSet<>();
-		restObject.getData().getAsJsonArray().forEach(json -> {
+		restObject.getResultData().getAsJsonArray().forEach(json -> {
 			deptIdList.add(json.getAsJsonObject().get("id").getAsString());
 		});
 
@@ -152,16 +150,16 @@ public class AuthorizationHandler {
 
 	public class RestObject {
 
-		private Integer status;
+		private Integer statusCode;
 		private String message;
-		private JsonElement data;
+		private JsonElement resultData;
 
-		public Integer getStatus() {
-			return status;
+		public Integer getStatusCode() {
+			return statusCode;
 		}
 
-		public void setStatus(Integer status) {
-			this.status = status;
+		public void setStatusCode(Integer statusCode) {
+			this.statusCode = statusCode;
 		}
 
 		public String getMessage() {
@@ -172,16 +170,16 @@ public class AuthorizationHandler {
 			this.message = message;
 		}
 
-		public JsonElement getData() {
-			return data;
+		public JsonElement getResultData() {
+			return resultData;
 		}
 
-		public void setData(JsonElement data) {
-			this.data = data;
+		public void setResultData(JsonElement resultData) {
+			this.resultData = resultData;
 		}
 
 		public boolean isSuccess() {
-			return this.status == SUCCESS;
+			return this.statusCode == SUCCESS;
 		}
 
 	}
