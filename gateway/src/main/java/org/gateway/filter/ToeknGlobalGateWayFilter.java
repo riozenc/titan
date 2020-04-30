@@ -48,13 +48,18 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 		}
 
 		if (null == token) {
-			return Mono.error(new Exception("token is null!"));
+			log.error("ERROR : " + exchange.getRequest().getId() + ":" + exchange.getRequest().getURI()
+					+ " token is null!");
+//			return Mono.error(new Exception("token is null!"));
+			return Mono.empty();
 		}
 
 		// 认证校验
 		String result = restTemplate.getForObject("http://AUTH-CENTER/auth/extractToken?token=" + token, String.class);
 		if (result == null) {
-			return Mono.error(new NullPointerException("extractToken result = " + result));
+//			return Mono.error(new NullPointerException("extractToken result = " + result));
+			log.error("ERROR : 空指针异常 extractToken result = " + result);
+			return Mono.empty();
 		}
 		try {
 			RestObject restObject = new Gson().fromJson(result, RestObject.class);
@@ -62,7 +67,7 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 				return chain.filter(exchange);
 			}
 		} catch (Exception e) {
-			log.error(result + " exception:" + e);
+			log.error("ERROR : " + result + " exception:" + e);
 		}
 
 		return Mono.error(new Exception(result));
