@@ -1,5 +1,5 @@
 server:
- port: 111111
+ port: 11110
  servlet:
   context-path: /titan-config
 spring:
@@ -18,7 +18,7 @@ eureka:
     prefer-ip-address: true
   client:
     serviceUrl:
-      defaultZone: http://172.21.29.55:77771/eureka/
+      defaultZone: http://titan:df6100@172.21.29.55:7771/eureka/
 logging:
   level:
     config: debug
