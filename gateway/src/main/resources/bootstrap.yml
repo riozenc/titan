@@ -14,8 +14,8 @@ eureka:
     #ip-address: 172.21.29.75
   client:
     serviceUrl:
-      #defaultZone: http://172.21.29.55:7777/eureka/
-      defaultZone: http://172.20.100.29:7777/eureka/
+      defaultZone: http://titan:df6100@172.20.100.29:7777/eureka/
+      #defaultZone: http://titan:df6100@127.0.0.1:7777/eureka/
 logging:
   level:
     org.gateway: debug
