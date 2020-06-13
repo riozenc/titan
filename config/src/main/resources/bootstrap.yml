@@ -1,5 +1,5 @@
 server:
- port: 11110
+ port: 11111
  servlet:
   context-path: /titan-config
 spring:
@@ -10,7 +10,7 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
  resources:
-   static-locations: file:D://titan-file/static,file:/home/titan/titan-file/static
+   static-locations: file:D://titan-file/static,file:/home/titan3/titan-file/static
  mvc:
    static-path-pattern: /static/**
 eureka:
@@ -18,7 +18,7 @@ eureka:
     prefer-ip-address: true
   client:
     serviceUrl:
-      defaultZone: http://titan:df6100@172.21.29.55:7771/eureka/
+      defaultZone: http://hegang:df6100@172.21.29.55:7777/hegang/eureka/
 logging:
   level:
     config: debug
