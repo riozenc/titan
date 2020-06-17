@@ -13,7 +13,8 @@ eureka:
     prefer-ip-address: true
   client:
     serviceUrl:
-      defaultZone: http://titan:df6100@192.168.229.128:7777/eureka/
+      defaultZone: http://guidong:df6100@192.168.229.128:7777/eureka/
+      #defaultZone: http://guidong:df6100@172.21.29.55:7777/guidong/eureka/
 logging:
   level:
     org.gateway: debug

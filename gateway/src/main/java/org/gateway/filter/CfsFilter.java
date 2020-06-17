@@ -16,19 +16,13 @@ import org.springframework.cloud.gateway.support.CachedBodyOutputMessage;
 import org.springframework.cloud.gateway.support.DefaultServerRequest;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ReactiveHttpOutputMessage;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.server.ServerWebExchange;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -51,7 +45,7 @@ public class CfsFilter extends DefaultAuthenticationInformationFilter implements
 					.flatMap(body -> {
 						String params = changeBody(exchange.getRequest(), body, managerId, roleIds, deptIds);
 						return Mono.just(params);
-					}).defaultIfEmpty(tamperWithJson(null, managerId, roleIds, deptIds));
+					}).defaultIfEmpty(changeBody(exchange.getRequest(), null, managerId, roleIds, deptIds));
 
 			BodyInserter<Mono<String>, ReactiveHttpOutputMessage> bodyInserter = BodyInserters
 					.fromPublisher(modifiedBody, String.class);
@@ -92,37 +86,7 @@ public class CfsFilter extends DefaultAuthenticationInformationFilter implements
 
 	}
 
-	private String changeBody(ServerHttpRequest serverHttpRequest, String body, String managerId, String roleIds,
-			String deptIds) {
-		MediaType mediaType = serverHttpRequest.getHeaders().getContentType();
-		if (mediaType == null) {
-			return tamperWithJson(body, managerId, roleIds, deptIds);
-		}
-		if (mediaType.includes(MediaType.MULTIPART_FORM_DATA)) {
-			return body;
-		}
-		if (!mediaType.includes(MediaType.APPLICATION_FORM_URLENCODED)) {
-			return tamperWithJson(body, managerId, roleIds, deptIds);
-		} else {
-			return tamperWithForm(body, managerId, roleIds, deptIds);
-		}
-	}
+	
 
-	private String tamperWithJson(String body, String userId, String roleIds, String deptIds) {
-		Gson gson = new Gson();
-		JsonElement jsonElement = body == null ? new JsonObject() : gson.fromJson(body, JsonElement.class);
-		if (jsonElement.isJsonObject()) {
-			jsonElement.getAsJsonObject().addProperty(AuthorizationHandler.MANAGER_ID, userId);
-			jsonElement.getAsJsonObject().addProperty(AuthorizationHandler.ROLE_IDS, roleIds);
-			jsonElement.getAsJsonObject().addProperty(AuthorizationHandler.DEPT_IDS, deptIds);
-		}
-		return jsonElement.toString();
-	}
-
-	private String tamperWithForm(String body, String userId, String roleIds, String deptIds) {
-		return new StringBuilder(null == body ? "" : body).append("&").append(AuthorizationHandler.MANAGER_ID)
-				.append("=").append(userId).append("&").append(AuthorizationHandler.ROLE_IDS).append("=")
-				.append(roleIds).append("&").append(AuthorizationHandler.DEPT_IDS).append("=").append(deptIds)
-				.toString();
-	}
+	
 }
