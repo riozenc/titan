@@ -56,6 +56,9 @@ public class DefaultAuthenticationInformationFilter implements AuthenticationInf
 	protected String changeBody(ServerHttpRequest serverHttpRequest, String body, String managerId, String roleIds,
 			String deptIds) {
 		MediaType mediaType = serverHttpRequest.getHeaders().getContentType();
+		if (mediaType == null) {
+			return tamperWithJson(body, managerId, roleIds, deptIds);
+		}
 
 		if (mediaType.includes(MediaType.APPLICATION_FORM_URLENCODED)) {
 			return tamperWithForm(body, managerId, roleIds, deptIds);
