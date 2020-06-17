@@ -5,6 +5,8 @@
  **/
 package org.gateway.handler;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,6 +28,8 @@ import org.springframework.web.client.RestTemplate;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
+import sun.misc.BASE64Encoder;
+
 @ControllerAdvice
 @RequestMapping("authorization")
 public class AuthorizationHandler {
@@ -36,6 +40,7 @@ public class AuthorizationHandler {
 	public final static String DEPT_IDS = "deptIds";
 	public final static String HEARDS_TOKEN = "Authorization";
 	private static final String LOGIN_TOKEN = "Basic dGVzdDp0ZXN0";
+	private static final String TOKEN = "titan-hegang";
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -141,7 +146,21 @@ public class AuthorizationHandler {
 
 	}
 
-	public void getToken() {
+	public String getToken(String token) {
+
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+
+			byte[] md5Bytes = md.digest(TOKEN.getBytes());
+
+			BASE64Encoder base64 = new BASE64Encoder();
+			String newStr = base64.encode(md5Bytes);
+			return newStr;
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+			return "NULL";
+		}
+
 	}
 
 	public void isValid() {

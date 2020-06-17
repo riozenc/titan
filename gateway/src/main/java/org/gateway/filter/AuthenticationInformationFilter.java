@@ -11,4 +11,5 @@ public interface AuthenticationInformationFilter {
 	String getRoleIds(String token) throws Exception;
 
 	String getDeptIds(String token) throws Exception;
+
 }

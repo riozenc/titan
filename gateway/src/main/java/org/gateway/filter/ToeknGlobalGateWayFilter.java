@@ -6,7 +6,7 @@
 package org.gateway.filter;
 
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,7 +33,10 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-		// TODO Auto-generated method stub
+
+		if (isIntranetPenetration(exchange.getRequest().getHeaders())) {
+			return chain.filter(exchange);
+		}
 
 		if (isStaticResources(exchange.getRequest().getURI())) {
 			return chain.filter(exchange);
@@ -78,6 +81,19 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 			return true;
 		}
 
+		return false;
+	}
+
+	private boolean isIntranetPenetration(HttpHeaders httpHeaders) {
+		List<String> tokens = httpHeaders.get("sign");
+		if(tokens==null) {
+			return false;
+		}
+		for (String token : tokens) {
+			if ("hegang".equals(token)) {
+				return true;
+			}
+		}
 		return false;
 	}
 
