@@ -5,6 +5,8 @@
 **/
 package org.rs.web.interceptor;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,21 +24,23 @@ public class BaseInterceptor implements HandlerInterceptor {
 			throws Exception {
 		// TODO Auto-generated method stub
 
-		logger.info("preHandle");
+		logger.info("[" + new Date() + "]{" + request.getRemoteAddr() + "} 执行" + handler.getClass() + "["
+				+ request.getMethod() + "]" + ":{" + request.getParameterMap() + "}");
 		return true;
+
 	}
 
 	@Override
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

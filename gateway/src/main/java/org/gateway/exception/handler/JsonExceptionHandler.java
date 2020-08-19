@@ -44,7 +44,6 @@ public class JsonExceptionHandler extends DefaultErrorWebExceptionHandler {
 	public JsonExceptionHandler(ErrorAttributes errorAttributes, ResourceProperties resourceProperties,
 			ErrorProperties errorProperties, ApplicationContext applicationContext) {
 		super(errorAttributes, resourceProperties, errorProperties, applicationContext);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -60,11 +59,11 @@ public class JsonExceptionHandler extends DefaultErrorWebExceptionHandler {
 	 * @return a {@code Publisher} of the HTTP response
 	 */
 	protected Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
-		boolean includeStackTrace = isIncludeStackTrace(request, MediaType.ALL);
-		Map<String, Object> error = getErrorAttributes(request, includeStackTrace);
-		HttpStatus errorStatus = getHttpStatus(error);
-		return ServerResponse.status(getHttpStatus(error)).contentType(MediaType.APPLICATION_JSON_UTF8)
-				.body(BodyInserters.fromObject(error)).doOnNext((resp) -> logError(request, errorStatus));
+		Map<String, Object> error = getErrorAttributes(request, getErrorAttributeOptions(request, MediaType.ALL));
+
+		return ServerResponse.status(getHttpStatus(error)).contentType(MediaType.APPLICATION_JSON)
+				.body(BodyInserters.fromValue(error))
+				.doOnNext((resp) -> logError(request, HttpStatus.valueOf(getHttpStatus(error))));
 	}
 
 	/**
@@ -73,9 +72,8 @@ public class JsonExceptionHandler extends DefaultErrorWebExceptionHandler {
 	 * @param errorAttributes the current error information
 	 * @return the error HTTP status
 	 */
-	protected HttpStatus getHttpStatus(Map<String, Object> errorAttributes) {
-		int statusCode = (int) errorAttributes.get("status");
-		return HttpStatus.valueOf(statusCode);
+	protected int getHttpStatus(Map<String, Object> errorAttributes) {
+		return (int) errorAttributes.get("status");
 	}
 
 	/**
