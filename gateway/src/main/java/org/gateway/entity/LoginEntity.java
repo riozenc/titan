@@ -9,6 +9,7 @@ package org.gateway.entity;
 public class LoginEntity {
 	private String username;
 	private String password;
+	private String deviceType;
 
 	public String getUsername() {
 		return username;
@@ -25,4 +26,13 @@ public class LoginEntity {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	public String getDeviceType() {
+		return deviceType;
+	}
+
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
+	}
+
 }
