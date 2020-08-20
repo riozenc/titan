@@ -6,7 +6,11 @@
 **/
 package org.gateway.filter.rateLimiter;
 
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.RequestRateLimiterGatewayFilterFactory;
+
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
+import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,5 +22,24 @@ public class RequestRateLimiterConfig {
 	public KeyResolver apiAndIpKeyResolver() {
 		return exchange -> Mono
 				.just(exchange.getRequest().getRemoteAddress().getHostName() + exchange.getRequest().getPath().value());
+	}
+
+	@Bean
+	public RedisRateLimiter redisRateLimiter() {
+
+		return new RedisRateLimiter(5, 20);
+	}
+
+	@Bean
+	public GatewayFilter rateLimiterFilter(
+			RequestRateLimiterGatewayFilterFactory requestRateLimiterGatewayFilterFactory,
+			RedisRateLimiter redisRateLimiter, KeyResolver apiAndIpKeyResolver) {
+
+		RequestRateLimiterGatewayFilterFactory.Config config = new RequestRateLimiterGatewayFilterFactory.Config();
+
+		config.setKeyResolver(apiAndIpKeyResolver);
+		config.setRateLimiter(redisRateLimiter);
+
+		return requestRateLimiterGatewayFilterFactory.apply(config);
 	}
 }

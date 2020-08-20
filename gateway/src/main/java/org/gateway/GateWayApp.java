@@ -55,8 +55,8 @@ public class GateWayApp {
 	@Bean
 	public RouteLocator authRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		Builder builder = routeLocatorBuilder.routes();
-		Builder asyncBuilder = builder.route(
-				r -> r.path("/auth/**").filters(f -> f.filter(new PreGatewayFilter())).uri("lb://AUTH-CENTER/"));
+		Builder asyncBuilder = builder
+				.route(r -> r.path("/auth/**").filters(f -> f.filter(new PreGatewayFilter())).uri("lb://AUTH-CENTER/"));
 		// StripPrefix
 		RouteLocator routeLocator = asyncBuilder.build();
 		return routeLocator;
@@ -126,7 +126,8 @@ public class GateWayApp {
 	public RouteLocator cimManagerRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		return routeLocatorBuilder.routes()
 				.route(r -> r.path("/cimServer/**")
-						.filters(f -> f.filter(SpringContextHolder.getBean(CimServerFilter.class)))
+						.filters(f -> f.filter(SpringContextHolder.getBean("rateLimiterFilter"))
+								.filter(SpringContextHolder.getBean(CimServerFilter.class)))
 						.uri("lb://CIM-SERVER/"))
 				.build();
 
