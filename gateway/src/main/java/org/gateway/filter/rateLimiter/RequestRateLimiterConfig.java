@@ -6,9 +6,10 @@
 **/
 package org.gateway.filter.rateLimiter;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.RequestRateLimiterGatewayFilterFactory;
-
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
 import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,12 @@ import reactor.core.publisher.Mono;
 
 @Configuration
 public class RequestRateLimiterConfig {
+
+	@Value("${rateLimiter.defaultReplenishRate}")
+	private int defaultReplenishRate;
+	@Value("${rateLimiter.defaultBurstCapacity}")
+	private int defaultBurstCapacity;
+
 	@Bean
 	public KeyResolver apiAndIpKeyResolver() {
 		return exchange -> Mono
@@ -27,7 +34,7 @@ public class RequestRateLimiterConfig {
 	@Bean
 	public RedisRateLimiter redisRateLimiter() {
 
-		return new RedisRateLimiter(5, 20);
+		return new RedisRateLimiter(defaultReplenishRate, defaultBurstCapacity);
 	}
 
 	@Bean
