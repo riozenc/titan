@@ -63,6 +63,7 @@ public class AuthorizationHandler {
 		MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
 		requestBody.add("username", loginEntity.getUsername());
 		requestBody.add("password", loginEntity.getPassword());
+		requestBody.add("deviceType", loginEntity.getDeviceType());
 		requestBody.add("grant_type", "password");
 
 		HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<MultiValueMap<String, String>>(

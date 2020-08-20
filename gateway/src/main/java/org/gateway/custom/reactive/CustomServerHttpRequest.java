@@ -3,6 +3,7 @@ package org.gateway.custom.reactive;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 
@@ -13,7 +14,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.AbstractServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.SslInfo;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
@@ -91,9 +91,8 @@ public class CustomServerHttpRequest implements ServerHttpRequest.Builder {
 	}
 
 	@Override
-	public ServerHttpRequest.Builder header(String key, String value) {
-		this.httpHeaders.remove(key);
-		this.httpHeaders.add(key, value);
+	public ServerHttpRequest.Builder header(String headerName, String... headerValues) {
+		this.httpHeaders.put(headerName, Arrays.asList(headerValues));
 		return this;
 	}
 

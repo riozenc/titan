@@ -5,21 +5,25 @@
  **/
 package org.gateway.filter;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.gateway.handler.AuthorizationHandler;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.factory.rewrite.CachedBodyOutputMessage;
 import org.springframework.cloud.gateway.support.BodyInserterContext;
-import org.springframework.cloud.gateway.support.CachedBodyOutputMessage;
-import org.springframework.cloud.gateway.support.DefaultServerRequest;
+
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ReactiveHttpOutputMessage;
+import org.springframework.http.codec.HttpMessageReader;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.server.HandlerStrategies;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.server.ServerWebExchange;
 
@@ -29,11 +33,16 @@ import reactor.core.publisher.Mono;
 @Component
 public class BemServerFilter extends DefaultAuthenticationInformationFilter implements GatewayFilter {
 	private static final Log log = LogFactory.getLog(BemServerFilter.class);
+	private final List<HttpMessageReader<?>> messageReaders;
+
+	public BemServerFilter() {
+		this.messageReaders = HandlerStrategies.withDefaults().messageReaders();
+	}
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 		String heardsToken = exchange.getRequest().getHeaders().getFirst(AuthorizationHandler.HEARDS_TOKEN);
-		ServerRequest serverRequest = new DefaultServerRequest(exchange);
+		ServerRequest serverRequest = ServerRequest.create(exchange, messageReaders);
 		try {
 			String managerId = super.getUserId(heardsToken);
 			String roleIds = super.getRoleIds(heardsToken);
@@ -51,7 +60,9 @@ public class BemServerFilter extends DefaultAuthenticationInformationFilter impl
 			HttpHeaders headers = new HttpHeaders();
 			headers.putAll(exchange.getRequest().getHeaders());
 			headers.remove(HttpHeaders.CONTENT_LENGTH);
+
 			CachedBodyOutputMessage outputMessage = new CachedBodyOutputMessage(exchange, headers);
+
 			return bodyInserter.insert(outputMessage, new BodyInserterContext())
 					// .log("modify_request", Level.INFO)
 					.then(Mono.defer(() -> {

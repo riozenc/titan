@@ -31,6 +31,8 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 	@Autowired
 	private RestTemplate restTemplate;
 
+	private boolean isBoot = false;
+
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
@@ -44,36 +46,38 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 
 		HttpHeaders httpHeaders = exchange.getRequest().getHeaders();
 
-		String token = httpHeaders.getFirst(AuthorizationHandler.HEARDS_TOKEN);
-
-		if (log.isDebugEnabled()) {
-			log.info(token);
-		}
-
-		if (null == token) {
-			log.error("ERROR : " + exchange.getRequest().getId() + ":" + exchange.getRequest().getURI()
-					+ " token is null!");
-			return Mono.error(new Exception("token is null!"));
-//			return Mono.empty();
-		}
-
-		// 认证校验
-		String result = restTemplate.getForObject("http://AUTH-CENTER/auth/extractToken?token=" + token, String.class);
-		if (result == null) {
-			log.error("ERROR : 空指针异常 extractToken result = " + result);
-			return Mono.error(new NullPointerException("extractToken result = " + result));
-//			return Mono.empty();
-		}
-		try {
-			RestObject restObject = new Gson().fromJson(result, RestObject.class);
-			if (restObject.isSuccess()) {
-				return chain.filter(exchange);
+		if (isBoot) {
+			String token = httpHeaders.getFirst(AuthorizationHandler.HEARDS_TOKEN);
+			if (log.isDebugEnabled()) {
+				log.info(token);
 			}
-		} catch (Exception e) {
-			log.error("ERROR : " + result + " exception:" + e);
+
+			if (null == token) {
+				log.error("ERROR : " + exchange.getRequest().getId() + ":" + exchange.getRequest().getURI()
+						+ " token is null!");
+				return Mono.error(new Exception("token is null!"));
+			}
+
+			// 认证校验
+			String result = restTemplate.getForObject("http://AUTH-CENTER/auth/extractToken?token=" + token,
+					String.class);
+			if (result == null) {
+				log.error("ERROR : 空指针异常 extractToken result = " + result);
+				return Mono.error(new NullPointerException("extractToken result = " + result));
+			}
+			try {
+				RestObject restObject = new Gson().fromJson(result, RestObject.class);
+				if (restObject.isSuccess()) {
+					return chain.filter(exchange);
+				}
+			} catch (Exception e) {
+				log.error("ERROR : " + result + " exception:" + e);
+			}
+			return Mono.error(new Exception(result));
+		} else {
+			return chain.filter(exchange);
 		}
 
-		return Mono.error(new Exception(result));
 	}
 
 	public boolean isStaticResources(URI uri) {
@@ -86,7 +90,7 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 
 	private boolean isIntranetPenetration(HttpHeaders httpHeaders) {
 		List<String> tokens = httpHeaders.get("sign");
-		if(tokens==null) {
+		if (tokens == null) {
 			return false;
 		}
 		for (String token : tokens) {
