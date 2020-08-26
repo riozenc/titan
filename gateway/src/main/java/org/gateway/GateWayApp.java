@@ -55,8 +55,8 @@ public class GateWayApp {
 	@Bean
 	public RouteLocator authRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		Builder builder = routeLocatorBuilder.routes();
-		Builder asyncBuilder = builder.route(
-				r -> r.path("/auth/**").filters(f -> f.filter(new PreGatewayFilter())).uri("lb://AUTH-CENTER/"));
+		Builder asyncBuilder = builder
+				.route(r -> r.path("/auth/**").filters(f -> f.filter(new PreGatewayFilter())).uri("lb://AUTH-CENTER/"));
 		// StripPrefix
 		RouteLocator routeLocator = asyncBuilder.build();
 		return routeLocator;
@@ -184,6 +184,19 @@ public class GateWayApp {
 		return routeLocatorBuilder
 				.routes().route(r -> r.path("/api/**")
 						.filters(f -> f.filter(SpringContextHolder.getBean(ApiFilter.class))).uri("lb://TITAN-API/"))
+				.build();
+	}
+
+	/**
+	 * 费控服务
+	 * 
+	 * @param routeLocatorBuilder
+	 * @return
+	 */
+	@Bean
+	public RouteLocator prepaidRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
+		return routeLocatorBuilder.routes().route(r -> r.path("/prepaidServer/**")
+				.filters(f -> f.filter(SpringContextHolder.getBean(ApiFilter.class))).uri("lb://PREPAID-SERVER/"))
 				.build();
 	}
 
