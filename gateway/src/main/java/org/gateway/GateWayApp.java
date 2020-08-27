@@ -195,8 +195,25 @@ public class GateWayApp {
 	 */
 	@Bean
 	public RouteLocator prepaidRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
-		return routeLocatorBuilder.routes().route(r -> r.path("/prepaidServer/**")
-				.filters(f -> f.filter(SpringContextHolder.getBean(ApiFilter.class))).uri("lb://PREPAID-SERVER/"))
+		return routeLocatorBuilder.routes()
+				.route(r -> r.path("/prepaidServer/**")
+						.filters(f -> f.filter(SpringContextHolder.getBean(ApiFilter.class)))
+						.uri("lb://PREPAID-SERVER/"))
+				.build();
+	}
+
+	/**
+	 * 任务服务
+	 * 
+	 * @param routeLocatorBuilder
+	 * @return
+	 */
+	@Bean
+	public RouteLocator taskRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
+		return routeLocatorBuilder.routes()
+				.route(r -> r.path("/taskServer/**")
+						.filters(f -> f.filter(SpringContextHolder.getBean(CimServerFilter.class)))
+						.uri("lb://TASK-SERVER/"))
 				.build();
 	}
 
