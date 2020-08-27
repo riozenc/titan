@@ -1,13 +1,7 @@
 package org.gateway;
 
 import org.gateway.custom.context.SpringContextHolder;
-import org.gateway.filter.ApiFilter;
-import org.gateway.filter.BemServerFilter;
-import org.gateway.filter.BillingServerFilter;
-import org.gateway.filter.CfsFilter;
-import org.gateway.filter.CimServerFilter;
-import org.gateway.filter.PreGatewayFilter;
-import org.gateway.filter.ReportServerFilter;
+import org.gateway.filter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -212,7 +206,7 @@ public class GateWayApp {
 	public RouteLocator taskRouteLocator(RouteLocatorBuilder routeLocatorBuilder) {
 		return routeLocatorBuilder.routes()
 				.route(r -> r.path("/taskServer/**")
-						.filters(f -> f.filter(SpringContextHolder.getBean(CimServerFilter.class)))
+						.filters(f -> f.filter(SpringContextHolder.getBean(TaskFilter.class)))
 						.uri("lb://TASK-SERVER/"))
 				.build();
 	}
