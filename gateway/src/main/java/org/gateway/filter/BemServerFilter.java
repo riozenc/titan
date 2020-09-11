@@ -41,6 +41,11 @@ public class BemServerFilter extends DefaultAuthenticationInformationFilter impl
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+		
+		if (!isChange(exchange.getRequest())) {
+			return chain.filter(exchange);
+		}
+
 		String heardsToken = exchange.getRequest().getHeaders().getFirst(AuthorizationHandler.HEARDS_TOKEN);
 		ServerRequest serverRequest = ServerRequest.create(exchange, messageReaders);
 		try {
