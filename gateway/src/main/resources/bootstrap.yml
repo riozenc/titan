@@ -13,9 +13,9 @@ eureka:
     prefer-ip-address: true
   client:
     serviceUrl:
-      #defaultZone: http://hegang:df6100@172.21.29.55:7777/hegang/eureka/
+      defaultZone: http://hegang:df6100@172.21.29.55:7777/hegang/eureka/
       #defaultZone: http://titan:df6100@47.92.88.159:7777/eureka/
-      defaultZone: http://hegang:df6100@127.0.0.1:7777/eureka/
+      #defaultZone: http://hegang:df6100@127.0.0.1:7777/eureka/
 logging:
   level:
     org.gateway: debug
