@@ -72,6 +72,7 @@ public class JsonErrorAttributes implements ErrorAttributes {
 		if (null != status) {
 			return HttpStatus.valueOf((int) status);
 		}
+
 		try {
 			RestObject restObject = GsonBuilderUtils.gsonBuilderWithBase64EncodedByteArrays().create()
 					.fromJson(error.getMessage(), RestObject.class);

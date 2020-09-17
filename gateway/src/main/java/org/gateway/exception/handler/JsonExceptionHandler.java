@@ -59,7 +59,8 @@ public class JsonExceptionHandler extends DefaultErrorWebExceptionHandler {
 	 * @return a {@code Publisher} of the HTTP response
 	 */
 	protected Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
-		Map<String, Object> error = getErrorAttributes(request, getErrorAttributeOptions(request, MediaType.ALL));
+
+		Map<String, Object> error = getErrorAttributes(request, true);
 
 		return ServerResponse.status(getHttpStatus(error)).contentType(MediaType.APPLICATION_JSON)
 				.body(BodyInserters.fromValue(error))
