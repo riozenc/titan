@@ -7,6 +7,8 @@
 package org.gateway.config;
 
 import org.gateway.filter.factory.PreGatewayFilterFactory;
+import org.gateway.filter.factory.SupplementManagerGatewayFilterFactory;
+import org.gateway.handler.AuthorizationHandler;
 import org.gateway.route.InRedisRouteDefinitionRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.gateway.route.InMemoryRouteDefinitionRepository;
@@ -35,4 +37,11 @@ public class CustomGatewayAutoConfiguration {
 	public PreGatewayFilterFactory preGatewayFilterFactory() {
 		return new PreGatewayFilterFactory();
 	}
+
+	@Bean
+	public SupplementManagerGatewayFilterFactory supplementManagerGatewayFilterFactory(
+			AuthorizationHandler authorizationHandler) {
+		return new SupplementManagerGatewayFilterFactory(authorizationHandler);
+	}
+
 }

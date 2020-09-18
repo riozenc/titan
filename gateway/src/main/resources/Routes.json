@@ -1,0 +1,242 @@
+[
+	{
+		"id": "security",
+		"predicates": [
+			{
+				"name": "Path",
+				"args": {
+					"_genkey_0": "/security/**"
+				}
+			}
+		],
+		"filters": [
+			{
+				"name": "Pre",
+				"args": {
+					
+				}
+			}
+		],
+		"uri": "lb://SECURITY-SERVER/",
+		"metadata": {
+			"name": "2"
+		},
+		"order": 0
+	},
+	{
+		"id": "auth",
+		"predicates": [
+			{
+				"name": "Path",
+				"args": {
+					"_genkey_0": "/auth/**"
+				}
+			}
+		],
+		"filters": [
+			{
+				"name": "Pre",
+				"args": {
+					
+				}
+			}
+		],
+		"uri": "lb://AUTH-CENTER/",
+		"order": 0
+	},
+	{
+		"id": "auth-data",
+		"predicates": [
+			{
+				"name": "Path",
+				"args": {
+					"_genkey_0": "/auth-data/**"
+				}
+			}
+		],
+		"filters": [
+			{
+				"name": "Pre",
+				"args": {
+					
+				}
+			}
+		],
+		"uri": "lb://AUTH-CENTER/",
+		"order": 0
+	},
+	{
+		"id": "titan-config",
+		"predicates": [
+			{
+				"name": "Path",
+				"args": {
+					"_genkey_0": "/titan-config/**"
+				}
+			}
+		],
+		"filters": [
+			{
+				"name": "Pre",
+				"args": {
+					
+				}
+			}
+		],
+		"uri": "lb://TITAN-CONFIG/",
+		"order": 0
+	},
+	{
+		"id": "userServer",
+		"predicates": [
+			{
+				"name": "Path",
+				"args": {
+					"_genkey_0": "/userServer/**/{seg}"
+				}
+			}
+		],
+		"filters": [
+			{
+				"name": "Pre",
+				"args": {
+					
+				}
+			}
+		],
+		"uri": "lb://USER-SERVER/",
+		"order": 0
+	},
+	{
+		"id": "bemServer",
+		"predicates": [
+			{
+				"name": "Path",
+				"args": {
+					"_genkey_0": "/bemServer/**"
+				}
+			}
+		],
+		"filters": [
+			{
+				"name": "SupplementManager",
+				"args": {
+					
+				}
+			}
+		],
+		"uri": "lb://BEM-SERVER/",
+		"order": 0
+	},
+	{
+		"id": "cimServer",
+		"predicates": [
+			{
+				"name": "Path",
+				"args": {
+					"_genkey_0": "/cimServer/**"
+				}
+			}
+		],
+		"filters": [
+			{
+				"name": "SupplementManager",
+				"args": {
+					
+				}
+			},
+			{
+				"name": "RequestRateLimiter",
+				"args": {
+					
+				}
+			}
+		],
+		"uri": "lb://CIM-SERVER/",
+		"order": 0
+	},
+	{
+		"id": "billingServer",
+		"predicates": [
+			{
+				"name": "Path",
+				"args": {
+					"_genkey_0": "/billingServer/**"
+				}
+			}
+		],
+		"filters": [
+			{
+				"name": "SupplementManager",
+				"args": {
+					
+				}
+			}
+		],
+		"uri": "lb://BILLING-SERVER/",
+		"order": 0
+	},
+	{
+		"id": "cfs",
+		"predicates": [
+			{
+				"name": "Path",
+				"args": {
+					"_genkey_0": "/cfs/**"
+				}
+			}
+		],
+		"filters": [
+			{
+				"name": "SupplementManager",
+				"args": {
+					
+				}
+			}
+		],
+		"uri": "lb://CFS/",
+		"order": 0
+	},
+	{
+		"id": "report",
+		"predicates": [
+			{
+				"name": "Path",
+				"args": {
+					"_genkey_0": "/report/**"
+				}
+			}
+		],
+		"filters": [
+			{
+				"name": "Pre",
+				"args": {
+					
+				}
+			}
+		],
+		"uri": "lb://TITAN-REPORT/",
+		"order": 0
+	},
+	{
+		"id": "api",
+		"predicates": [
+			{
+				"name": "Path",
+				"args": {
+					"_genkey_0": "/api/**"
+				}
+			}
+		],
+		"filters": [
+			{
+				"name": "Pre",
+				"args": {
+					
+				}
+			}
+		],
+		"uri": "lb://TITAN-API/",
+		"order": 0
+	}
+]
