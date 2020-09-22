@@ -91,16 +91,22 @@ public class InRedisRouteDefinitionRepository implements RouteDefinitionReposito
 	}
 
 	private Mono<Void> redisSave(String key, RouteDefinition value) {
+
 		return this.redisTemplate.hasKey(key).flatMap(r -> {
-//			if (r == true) {
-//				return Mono.defer(() -> Mono.error(new NotFoundException("redis refush error!")));
-//			} else {
-//				return this.redisTemplate.opsForValue().set(key, new Gson().toJson(value));
-//			}
-			
-			
-			return this.redisTemplate.opsForValue().set(key, new Gson().toJson(value));
-		}).then();
+			if (r == true) {
+				return Mono.empty();
+			} else {
+				return this.redisTemplate.opsForValue().set(key, new Gson().toJson(value));
+			}
+
+//			return this.redisTemplate.opsForValue().set(key, new Gson().toJson(value));
+		})
+//				.switchIfEmpty(Mono.error(new RedisSystemException("Cannot rename key that does not exist",
+//				new RedisException("ERR no such key."))))
+				.switchIfEmpty(Mono.defer(() -> {
+					log.debug(key + " route is exist!");
+					return Mono.empty();
+				})).then();
 	}
 
 	/**
