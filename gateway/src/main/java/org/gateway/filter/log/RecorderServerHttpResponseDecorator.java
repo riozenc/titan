@@ -51,7 +51,7 @@ public class RecorderServerHttpResponseDecorator extends ServerHttpResponseDecor
 				String resBody = new String(content, Charset.forName("UTF-8"));
 
 				try {
-					log.info("--date:" + new Date() + "--" + resBody + "----");
+					log.debug("--date:" + new Date() + "--" + resBody + "----");
 				} catch (Exception e) {
 					log.error("Response值修改日志记录出现错误->{}", e);
 				}

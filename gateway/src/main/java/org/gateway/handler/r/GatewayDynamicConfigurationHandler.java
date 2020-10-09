@@ -131,7 +131,6 @@ public class GatewayDynamicConfigurationHandler implements ApplicationEventPubli
 	@RequestMapping("/routes/refush")
 	public Mono<ResponseEntity<String>> refush() {
 		return Mono.defer(() -> routeDefinitionReader.refush().doFinally((a) -> {
-			System.out.println(a);
 			log.info("Refush route: " + a);
 			this.publisher.publishEvent(new RefreshRoutesEvent(this));
 		}).then(Mono.defer(() -> Mono.just(ResponseEntity.created(URI.create("/routes/")).body("刷新成功.")))))

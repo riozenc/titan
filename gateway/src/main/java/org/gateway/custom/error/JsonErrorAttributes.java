@@ -80,7 +80,7 @@ public class JsonErrorAttributes implements ErrorAttributes {
 				return HttpStatus.valueOf(restObject.getStatusCode());
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.out.println("结果转json失败，内容: " + error.getMessage());
 		}
 
 		if (error instanceof ResponseStatusException) {

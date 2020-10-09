@@ -8,11 +8,6 @@ spring:
    discovery:
     locator:
      enabled: true
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
 eureka:
   instance: 
     prefer-ip-address: true
@@ -23,6 +18,6 @@ eureka:
       defaultZone: http://hegang:df6100@127.0.0.1:7777/eureka/
 logging:
   level:
-    org.gateway: debug
-    org.springframework.cloud.gateway: debug
+    org.gateway: info
+    org.springframework.cloud.gateway: info
   path: log

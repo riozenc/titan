@@ -8,22 +8,25 @@ package org.gateway.route;
 
 import static java.util.Collections.synchronizedMap;
 
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.cloud.gateway.route.RouteDefinition;
 import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.cloud.gateway.support.NotFoundException;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.http.converter.json.GsonBuilderUtils;
-import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 import com.google.gson.Gson;
@@ -113,17 +116,21 @@ public class InRedisRouteDefinitionRepository implements RouteDefinitionReposito
 	 * 从json中获取数据，丢到redis中，防止出现新环境redis中无数据的情况
 	 */
 	private void init() {
-		File jsonFile;
-		try {
-			jsonFile = ResourceUtils.getFile("classpath:Routes.json");
 
-			Scanner scanner = null;
+		try {
+			Resource fileRource = new ClassPathResource("Routes.json");
+
+			InputStream input = fileRource.getInputStream();
+			InputStreamReader inputStreamReader = new InputStreamReader(input);
+			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
 			StringBuilder buffer = new StringBuilder();
+
 			try {
-				scanner = new Scanner(jsonFile, "utf-8");
-				while (scanner.hasNextLine()) {
-					buffer.append(scanner.nextLine());
-				}
+				bufferedReader.lines().forEach(s -> {
+					buffer.append(s);
+				});
+
 				String json = buffer.toString();
 
 				Type typeOfT = TypeToken.getParameterized(List.class, RouteDefinition.class).getType();
@@ -137,14 +144,19 @@ public class InRedisRouteDefinitionRepository implements RouteDefinitionReposito
 						}))).subscribe();
 
 			} finally {
-				if (scanner != null) {
-					scanner.close();
-				}
+				if (bufferedReader != null)
+					bufferedReader.close();
+				if (inputStreamReader != null)
+					inputStreamReader.close();
+				if (input != null)
+					input.close();
 			}
 
 		} catch (FileNotFoundException e) {
 			log.error(e.getMessage());
 
+		} catch (IOException e) {
+			log.error(e.getMessage());
 		}
 
 	}

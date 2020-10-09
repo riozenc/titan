@@ -1,5 +1,7 @@
 package org.gateway;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -21,7 +23,7 @@ public class GateWayApp {
 		return new RestTemplate();
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		SpringApplication.run(GateWayApp.class, args);
 		LOGGER.info("Start GateWayApp Done");
 	}

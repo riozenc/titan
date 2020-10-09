@@ -87,27 +87,6 @@
 		"order": 0
 	},
 	{
-		"id": "userServer",
-		"predicates": [
-			{
-				"name": "Path",
-				"args": {
-					"_genkey_0": "/userServer/**/{seg}"
-				}
-			}
-		],
-		"filters": [
-			{
-				"name": "Pre",
-				"args": {
-					
-				}
-			}
-		],
-		"uri": "lb://USER-SERVER/",
-		"order": 0
-	},
-	{
 		"id": "bemServer",
 		"predicates": [
 			{
