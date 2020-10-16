@@ -29,7 +29,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-
 @Component
 public class RequestRecorderGlobalFilter implements GlobalFilter, Ordered {
 	private static final Log log = LogFactory.getLog(RequestRecorderGlobalFilter.class);
@@ -46,6 +45,11 @@ public class RequestRecorderGlobalFilter implements GlobalFilter, Ordered {
 		// 只记录http的请求
 		String scheme = originalRequestUrl.getScheme();
 		if ((!SUPPORT_SCHEME_HTTP.equals(scheme) && !SUPPORT_SCHEME_HTTPS.equals(scheme))) {
+			return chain.filter(exchange);
+		}
+
+		// 如果是文件获取直接跳过
+		if (originalRequestUrl.getPath().contains("static")) {
 			return chain.filter(exchange);
 		}
 
