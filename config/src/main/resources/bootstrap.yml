@@ -18,7 +18,7 @@ eureka:
     prefer-ip-address: true
   client:
     serviceUrl:
-      defaultZone: http://hegang:df6100@172.21.29.55:7777/hegang/eureka/
+      defaultZone: http://enn:df6100@172.21.29.55:7777/enn/eureka/
 logging:
   level:
     config: debug
