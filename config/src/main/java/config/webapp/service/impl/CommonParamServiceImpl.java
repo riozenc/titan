@@ -63,8 +63,8 @@ public class CommonParamServiceImpl implements ICommonParamService {
 		CommonParamDomain commonParamDomain = new CommonParamDomain();
 
 		commonParamDomain.setType("CURRENT_MON");
-		commonParamDomain.setParamKey(0);
-		commonParamDomain.setStatus((byte)1);
+		commonParamDomain.setParamKey("0");
+		commonParamDomain.setStatus((byte) 1);
 
 		List<CommonParamDomain> list = commonParamDAO.findByWhere(commonParamDomain);
 		if (list.isEmpty()) {
@@ -74,7 +74,7 @@ public class CommonParamServiceImpl implements ICommonParamService {
 	}
 
 	@Override
-	public List<String> getDistinctName(){
+	public List<String> getDistinctName() {
 		return commonParamDAO.getDistinctName();
 	}
 }

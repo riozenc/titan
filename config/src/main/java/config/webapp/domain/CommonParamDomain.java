@@ -10,7 +10,7 @@ public class CommonParamDomain extends Page implements MybatisEntity {
 	private Long id;
 	private String type;
 	private String paramName;
-	private Integer paramKey;
+	private String paramKey;
 	private String paramValue;
 	private Integer paramOrder;
 	private String remark1;
@@ -43,11 +43,11 @@ public class CommonParamDomain extends Page implements MybatisEntity {
 		this.paramName = paramName;
 	}
 
-	public Integer getParamKey() {
+	public String getParamKey() {
 		return paramKey;
 	}
 
-	public void setParamKey(Integer paramKey) {
+	public void setParamKey(String paramKey) {
 		this.paramKey = paramKey;
 	}
 

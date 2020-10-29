@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import com.riozenc.titanTool.spring.web.http.HttpResultPagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.riozenc.titanTool.common.json.utils.GsonUtils;
 import com.riozenc.titanTool.spring.web.http.HttpResult;
+import com.riozenc.titanTool.spring.web.http.HttpResultPagination;
 
 import config.webapp.domain.CommonParamDomain;
 import config.webapp.service.ICommonParamService;
@@ -38,8 +39,7 @@ public class ConfigAction {
 	@PostMapping("getSysCommConfig")
 	@ResponseBody
 	public Object getCommonParam(@RequestBody CommonParamDomain commonParamDomain) {
-		return new HttpResultPagination(commonParamDomain,
-				commonParamService.findByWhere(commonParamDomain));
+		return new HttpResultPagination(commonParamDomain, commonParamService.findByWhere(commonParamDomain));
 	}
 
 	@PostMapping("findByWhere")
@@ -52,17 +52,16 @@ public class ConfigAction {
 	@PostMapping("getAllSysCommConfig")
 	@ResponseBody
 	public Object getAllSysCommConfig(@RequestBody String a) {
-		Map<String, List<CommonParamDomain>> dropMap = new HashMap<String, List<CommonParamDomain>>();
+
 		CommonParamDomain domain = new CommonParamDomain();
-		List<CommonParamDomain> typeList = commonParamService.getAllType(a);
-		for (CommonParamDomain dom : typeList) {
-			if("-1".equals(a)){
-				domain.setPageSize(-1);
-			}
-			domain.setType(dom.getType());
-			List<CommonParamDomain> list = commonParamService.findByWhere(domain);
-			dropMap.put(dom.getType(), list);
+		if ("-1".equals(a)) {
+			domain.setPageSize(-1);
 		}
+		List<CommonParamDomain> list = commonParamService.findByWhere(domain);
+
+		Map<String, List<CommonParamDomain>> dropMap = list.parallelStream()
+				.collect(Collectors.groupingBy(CommonParamDomain::getType));
+
 		return dropMap;
 	}
 
