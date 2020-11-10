@@ -194,7 +194,7 @@
 				}
 			}
 		],
-		"uri": "lb://TITAN-REPORT/",
+		"uri": "lb://FMS-REPORT/",
 		"order": 0
 	},
 	{
@@ -215,7 +215,28 @@
 				}
 			}
 		],
-		"uri": "lb://TITAN-API/",
+		"uri": "lb://FMS-API/",
+		"order": 0
+	},
+	{
+		"id": "eis",
+		"predicates": [
+			{
+				"name": "Path",
+				"args": {
+					"_genkey_0": "/eis/**"
+				}
+			}
+		],
+		"filters": [
+			{
+				"name": "Pre",
+				"args": {
+					
+				}
+			}
+		],
+		"uri": "lb://FMS-EIS-SERVER/",
 		"order": 0
 	}
 ]

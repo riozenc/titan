@@ -1,5 +1,6 @@
 server:
- port: 9922
+ #port: 9922
+ port: 6152
 spring:
  application:
   name: gateway
@@ -13,7 +14,8 @@ eureka:
     prefer-ip-address: true
   client:
     serviceUrl:
-      defaultZone: http://enn:df6100@127.0.0.1:7777/eureka/
+      #defaultZone: http://enn:df6100@127.0.0.1:7777/eureka/
+      defaultZone: http://titan:df6100@10.39.68.27:6150/eureka/
 logging:
   level:
     org.gateway: info

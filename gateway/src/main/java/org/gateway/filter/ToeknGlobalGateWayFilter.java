@@ -13,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import org.gateway.handler.AuthorizationHandler;
 import org.gateway.handler.AuthorizationHandler.RestObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -31,7 +32,8 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 	@Autowired
 	private RestTemplate restTemplate;
 
-	private boolean isBoot = false;
+	@Value("${gateway.auth.isEnable}")
+	private boolean isEnable;
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -46,7 +48,7 @@ public class ToeknGlobalGateWayFilter implements GlobalFilter, Ordered {
 
 		HttpHeaders httpHeaders = exchange.getRequest().getHeaders();
 
-		if (isBoot) {
+		if (isEnable) {
 			String token = httpHeaders.getFirst(AuthorizationHandler.HEARDS_TOKEN);
 			if (log.isDebugEnabled()) {
 				log.info(token);
