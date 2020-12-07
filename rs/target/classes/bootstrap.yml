@@ -1,10 +1,18 @@
 server:
   port: 7777
+spring:
+  security:
+    user:
+      name: titan
+      password: df6100
 eureka:
   instance:
     hostname: rs
+  server:
+    #关闭保护
+    enable-self-preservation: false
   client:
     registerWithEureka: false
     fetchRegistry: false
     serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@${eureka.instance.hostname}:${server.port}/eureka/
