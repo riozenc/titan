@@ -63,6 +63,21 @@ public class ConfigAction {
 			List<CommonParamDomain> list = commonParamService.findByWhere(domain);
 			dropMap.put(dom.getType(), list);
 		}
+		CommonParamDomain ykTemplateDomain = new CommonParamDomain();
+		ykTemplateDomain.setType("TEMPLATE_TYPE");
+		ykTemplateDomain.setRemark1("YK");
+		ykTemplateDomain.setPageSize(-1);
+		List<CommonParamDomain> ykTemplateList=
+				commonParamService.findByWhere(ykTemplateDomain);
+		dropMap.put(ykTemplateDomain.getType()+"_"+ykTemplateDomain.getRemark1(), ykTemplateList);
+
+		CommonParamDomain dfTemplateDomain = new CommonParamDomain();
+		dfTemplateDomain.setType("TEMPLATE_TYPE");
+		dfTemplateDomain.setRemark1("DF");
+		dfTemplateDomain.setPageSize(-1);
+		List<CommonParamDomain> dfTemplateList=
+				commonParamService.findByWhere(dfTemplateDomain);
+		dropMap.put(dfTemplateDomain.getType()+"_"+dfTemplateDomain.getRemark1(), dfTemplateList);
 		return dropMap;
 	}
 
@@ -83,7 +98,7 @@ public class ConfigAction {
 
 	@PostMapping("getCurrentMon")
 	@ResponseBody
-	public Object getCurrentMon() throws Exception {
+	public String getCurrentMon() throws Exception {
 		return commonParamService.getCurrentMon();
 	}
 
