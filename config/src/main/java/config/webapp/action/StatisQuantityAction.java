@@ -1,8 +1,10 @@
 package config.webapp.action;
 
+import com.google.gson.JsonObject;
 import com.riozenc.titanTool.common.json.utils.GsonUtils;
 import com.riozenc.titanTool.spring.web.http.HttpResult;
 import com.riozenc.titanTool.spring.web.http.HttpResultPagination;
+import config.util.MonUtils;
 import config.webapp.domain.CommonParamDomain;
 import config.webapp.service.ICommonParamService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 //获取首页数量
@@ -35,17 +35,18 @@ public class StatisQuantityAction {
         Map<String, Long> returnMap = new HashMap<>();
         try {
             String customerSizeKey = "customerSize";
-            Long customerSize = (long) redisTemplate.opsForValue().get(customerSizeKey);
+            Long customerSize =
+                    (long) Optional.ofNullable(redisTemplate.opsForValue().get(customerSizeKey)).orElse((long)0);
             String transformerSizeKey = "transformerSize";
-            Long transformerSize = (long) redisTemplate.opsForValue().get(transformerSizeKey);
+            Long transformerSize = (long) Optional.ofNullable(redisTemplate.opsForValue().get(transformerSizeKey)).orElse((long)0);
             String meterAssetsSizeKey = "meterAssetsSize";
-            Long meterAssetsSize = (long) redisTemplate.opsForValue().get(meterAssetsSizeKey);
+            Long meterAssetsSize = (long) Optional.ofNullable(redisTemplate.opsForValue().get(meterAssetsSizeKey)).orElse((long)0);
             String writeSectSizeKey = "writeSectSize";
-            Long writeSectSize = (long) redisTemplate.opsForValue().get(writeSectSizeKey);
+            Long writeSectSize = (long) Optional.ofNullable(redisTemplate.opsForValue().get(writeSectSizeKey)).orElse((long)0);
             String subSizeKey = "subSize";
-            Long subSize = (long) redisTemplate.opsForValue().get(subSizeKey);
+            Long subSize = (long) Optional.ofNullable(redisTemplate.opsForValue().get(subSizeKey)).orElse((long)0);
             String meterSizeKey = "meterSize";
-            Long meterSize = (long) redisTemplate.opsForValue().get(meterSizeKey);
+            Long meterSize = (long) Optional.ofNullable(redisTemplate.opsForValue().get(meterSizeKey)).orElse((long)0);
 
             returnMap.put("customerSize", customerSize);
             returnMap.put("transformerSize", transformerSize);
@@ -65,8 +66,7 @@ public class StatisQuantityAction {
     @PostMapping("getElecTypeQuantity")
     @ResponseBody
     public HttpResult getElecTypeQuantity() {
-        Map<String, Long> returnMap = new HashMap<>();
-  //下拉
+        //下拉
         CommonParamDomain systemCommonConfigDomain =
                 new CommonParamDomain();
         systemCommonConfigDomain.setPageSize(-1);
@@ -75,29 +75,73 @@ public class StatisQuantityAction {
                 commonParamService.findByWhere(systemCommonConfigDomain);
         Map<Integer, String> systemCommonMap = systemCommonConfigDomains.stream()
                 .collect(Collectors.toMap(CommonParamDomain::getParamKey, m -> m.getParamValue(), (k1, k2) -> k1));
-        try {
-            String customerSizeKey = "customerSize";
-            Long customerSize = (long) redisTemplate.opsForValue().get(customerSizeKey);
-            String transformerSizeKey = "transformerSize";
-            Long transformerSize = (long) redisTemplate.opsForValue().get(transformerSizeKey);
-            String meterAssetsSizeKey = "meterAssetsSize";
-            Long meterAssetsSize = (long) redisTemplate.opsForValue().get(meterAssetsSizeKey);
-            String writeSectSizeKey = "writeSectSize";
-            Long writeSectSize = (long) redisTemplate.opsForValue().get(writeSectSizeKey);
-            String subSizeKey = "subSize";
-            Long subSize = (long) redisTemplate.opsForValue().get(subSizeKey);
-            String meterSizeKey = "meterSize";
-            Long meterSize = (long) redisTemplate.opsForValue().get(meterSizeKey);
 
-            returnMap.put("customerSize", customerSize);
-            returnMap.put("transformerSize", transformerSize);
-            returnMap.put("meterAssetsSize", meterAssetsSize);
-            returnMap.put("writeSectSize", writeSectSize);
-            returnMap.put("subSize", subSize);
-            returnMap.put("meterSize", meterSize);
+        List<Map<String,String>> mapList=new ArrayList<>();
+        try {
+            systemCommonMap.forEach((k,v)->{
+                Long num =
+                        (long) Optional.ofNullable(redisTemplate.opsForValue().get("METER_ELEC_TYPE"+k)).orElse((long)0);
+                if(num>0){
+                    Map<String,String> map=new HashMap<>();
+                    map.put("name",v);
+                    map.put("value",num.toString());
+                    mapList.add(map);
+                }
+
+            });
         } catch (Exception e) {
             return new HttpResult(HttpResult.ERROR,
-                    "获取首页数量失败" + e.getMessage());
+                    "获取首页饼形图数量失败" + e.getMessage());
+        }
+
+        return new HttpResult(HttpResult.SUCCESS, mapList);
+    }
+
+
+    // 获取电量
+    @PostMapping("getPowerQuantity")
+    @ResponseBody
+    public HttpResult getPowerQuantity() throws Exception {
+
+        String currentmon=commonParamService.getCurrentMon();
+        String endMon=MonUtils.getNextMon(currentmon.substring(0, 4)+"12");
+        String startMon=currentmon.substring(0, 4)+"01";
+
+        Map<String,String> returnMap=new TreeMap<>();
+        try {
+        while (!startMon.equals(endMon)){
+            Long power =
+                    (long) Optional.ofNullable(redisTemplate.opsForValue().get("POWER_"+startMon)).orElse((long)0);
+            returnMap.put(startMon,power.toString());
+            startMon= MonUtils.getNextMon(startMon);
+        }
+        } catch (Exception e) {
+            return new HttpResult(HttpResult.ERROR,
+                    "获取首页电量数量失败" + e.getMessage());
+        }
+        return new HttpResult(HttpResult.SUCCESS, returnMap);
+    }
+
+    // 获取电量
+    @PostMapping("getMoneyQuantity")
+    @ResponseBody
+    public HttpResult getMoneyQuantity() throws Exception {
+
+        String currentmon=commonParamService.getCurrentMon();
+        String endMon=MonUtils.getNextMon(currentmon.substring(0, 4)+"12");
+        String startMon=currentmon.substring(0, 4)+"01";
+
+        Map<String,String> returnMap=new TreeMap<>();
+        try {
+            while (!startMon.equals(endMon)){
+                Double amount =
+                        (double) Optional.ofNullable(redisTemplate.opsForValue().get("AMOUNT_"+startMon)).orElse((double)0);
+                returnMap.put(startMon,amount.toString());
+                startMon= MonUtils.getNextMon(startMon);
+            }
+        } catch (Exception e) {
+            return new HttpResult(HttpResult.ERROR,
+                    "获取首页电费数量失败" + e.getMessage());
         }
 
         return new HttpResult(HttpResult.SUCCESS, returnMap);
