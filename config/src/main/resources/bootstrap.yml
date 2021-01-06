@@ -5,6 +5,11 @@ server:
 spring:
  application:
   name: titan-config
+ redis:
+   database: 0
+   host: ${REDIS_HOST:172.21.29.55}
+   port: ${REDIS_PORT:6380}
+   password: ${REDIS_PASS_WORD:wisdom.df6100}
  servlet:
     multipart:
       max-file-size: 100MB
