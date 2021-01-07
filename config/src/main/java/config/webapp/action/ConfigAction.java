@@ -52,16 +52,32 @@ public class ConfigAction {
 	@PostMapping("getAllSysCommConfig")
 	@ResponseBody
 	public Object getAllSysCommConfig(@RequestBody String a) {
-
+		Map<String, List<CommonParamDomain>> dropMap = new HashMap<String, List<CommonParamDomain>>();
 		CommonParamDomain domain = new CommonParamDomain();
-		if ("-1".equals(a)) {
-			domain.setPageSize(-1);
+		List<CommonParamDomain> typeList = commonParamService.getAllType(a);
+		for (CommonParamDomain dom : typeList) {
+			if("-1".equals(a)){
+				domain.setPageSize(-1);
+			}
+			domain.setType(dom.getType());
+			List<CommonParamDomain> list = commonParamService.findByWhere(domain);
+			dropMap.put(dom.getType(), list);
 		}
-		List<CommonParamDomain> list = commonParamService.findByWhere(domain);
+		CommonParamDomain ykTemplateDomain = new CommonParamDomain();
+		ykTemplateDomain.setType("TEMPLATE_TYPE");
+		ykTemplateDomain.setRemark1("YK");
+		ykTemplateDomain.setPageSize(-1);
+		List<CommonParamDomain> ykTemplateList=
+				commonParamService.findByWhere(ykTemplateDomain);
+		dropMap.put(ykTemplateDomain.getType()+"_"+ykTemplateDomain.getRemark1(), ykTemplateList);
 
-		Map<String, List<CommonParamDomain>> dropMap = list.parallelStream()
-				.collect(Collectors.groupingBy(CommonParamDomain::getType));
-
+		CommonParamDomain dfTemplateDomain = new CommonParamDomain();
+		dfTemplateDomain.setType("TEMPLATE_TYPE");
+		dfTemplateDomain.setRemark1("DF");
+		dfTemplateDomain.setPageSize(-1);
+		List<CommonParamDomain> dfTemplateList=
+				commonParamService.findByWhere(dfTemplateDomain);
+		dropMap.put(dfTemplateDomain.getType()+"_"+dfTemplateDomain.getRemark1(), dfTemplateList);
 		return dropMap;
 	}
 
