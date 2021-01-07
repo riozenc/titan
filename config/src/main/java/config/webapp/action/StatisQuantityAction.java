@@ -110,8 +110,8 @@ public class StatisQuantityAction {
         Map<String,String> returnMap=new TreeMap<>();
         try {
         while (!startMon.equals(endMon)){
-            Long power =
-                    (long) Optional.ofNullable(redisTemplate.opsForValue().get("POWER_"+startMon)).orElse((long)0);
+            Double power =
+                    (double) Optional.ofNullable(redisTemplate.opsForValue().get("POWER_"+startMon)).orElse((double)0);
             returnMap.put(startMon,power.toString());
             startMon= MonUtils.getNextMon(startMon);
         }
