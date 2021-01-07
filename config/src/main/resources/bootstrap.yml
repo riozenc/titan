@@ -7,8 +7,8 @@ spring:
   name: titan-config
  redis:
    database: 0
-   host: ${REDIS_HOST:172.21.29.55}
-   port: ${REDIS_PORT:6380}
+   host: ${REDIS_HOST:172.20.100.30}
+   port: ${REDIS_PORT:6379}
    password: ${REDIS_PASS_WORD:wisdom.df6100}
  servlet:
     multipart:
@@ -24,7 +24,7 @@ eureka:
     #ip-address: 172.21.29.75
   client:
     serviceUrl:
-      defaultZone: http://guidong:df6100@172.21.29.55:7777/guidong/eureka/
+      defaultZone: http://titan:df6100@172.20.100.29:7777/eureka/
       #defaultZone: http://10.1.0.192:7777/eureka/
 logging:
   level:
