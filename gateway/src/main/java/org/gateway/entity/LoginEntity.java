@@ -10,6 +10,7 @@ public class LoginEntity {
 	private String username;
 	private String password;
 	private String deviceType;
+	private String loginType;
 
 	public String getUsername() {
 		return username;
@@ -35,4 +36,11 @@ public class LoginEntity {
 		this.deviceType = deviceType;
 	}
 
+	public String getLoginType() {
+		return loginType;
+	}
+
+	public void setLoginType(String loginType) {
+		this.loginType = loginType;
+	}
 }

@@ -62,6 +62,7 @@ public class AuthorizationHandler {
 		requestBody.add("password", loginEntity.getPassword());
 		requestBody.add("deviceType", loginEntity.getDeviceType());
 		requestBody.add("grant_type", "password");
+		requestBody.add("loginType", loginEntity.getLoginType());
 
 		HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<MultiValueMap<String, String>>(
 				requestBody, httpHeaders);
