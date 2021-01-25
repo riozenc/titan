@@ -25,6 +25,7 @@ import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.util.StringUtils;
@@ -84,6 +85,7 @@ public class InRedisRouteDefinitionRepository implements RouteDefinitionReposito
 		// 获取所有路由信息
 		return this.redisTemplate.scan().flatMap(key -> {
 			// 根据key获取缓存中的route
+//			this.redisTemplate.type(key).filter(tester->tester==DataType.STRING);
 			return this.redisTemplate.opsForValue().get(key).map(value -> {
 				RouteDefinition r = new Gson().fromJson(value, RouteDefinition.class);
 				routes.put(r.getId(), r);
