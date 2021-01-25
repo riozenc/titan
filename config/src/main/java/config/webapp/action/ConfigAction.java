@@ -1,11 +1,16 @@
 package config.webapp.action;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import config.webapp.domain.MapDomain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -161,4 +166,20 @@ public class ConfigAction {
 		}
 	}
 
+
+	@PostMapping("getMapData")
+	@ResponseBody
+	public List<MapDomain> getMapData() throws IOException {
+		String path = "/mapDataInfo.json";
+		InputStream config = getClass().getResourceAsStream(path);
+        byte[] byteArr = new byte[config.available()];
+        config.read(byteArr);
+        String str = new String(byteArr);
+		if (config == null) {
+			throw new RuntimeException("读取文件失败");
+		} else {
+			List<MapDomain> json = JSON.parseArray(str, MapDomain.class);
+			return json;
+		}
+	}
 }
