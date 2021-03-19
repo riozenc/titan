@@ -25,7 +25,6 @@ import org.springframework.cloud.gateway.route.RouteDefinitionRepository;
 import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.util.StringUtils;
@@ -41,6 +40,8 @@ public class InRedisRouteDefinitionRepository implements RouteDefinitionReposito
 	private final Map<String, RouteDefinition> routes = synchronizedMap(new LinkedHashMap<String, RouteDefinition>());
 
 	private ReactiveStringRedisTemplate redisTemplate;
+
+	private final static String REDIS_GATEWAY = "REDIS_GATEWAY";
 
 	public InRedisRouteDefinitionRepository(ReactiveStringRedisTemplate redisTemplate) {
 		this.redisTemplate = redisTemplate;
@@ -68,7 +69,7 @@ public class InRedisRouteDefinitionRepository implements RouteDefinitionReposito
 		return routeId.flatMap(id -> {
 			if (routes.containsKey(id)) {
 				routes.remove(id);
-				return Mono.defer(() -> this.redisTemplate.delete(id).then());
+				return Mono.defer(() -> this.redisTemplate.opsForHash().remove(REDIS_GATEWAY, id).then());
 			}
 			return Mono.defer(() -> Mono.error(new NotFoundException("RouteDefinition not found: " + routeId)));
 		});
@@ -82,36 +83,35 @@ public class InRedisRouteDefinitionRepository implements RouteDefinitionReposito
 
 	@Override
 	public Mono<Void> refush() {
-		// 获取所有路由信息
-		return this.redisTemplate.scan().flatMap(key -> {
-			// 根据key获取缓存中的route
-//			this.redisTemplate.type(key).filter(tester->tester==DataType.STRING);
-			return this.redisTemplate.opsForValue().get(key).map(value -> {
-				RouteDefinition r = new Gson().fromJson(value, RouteDefinition.class);
-				routes.put(r.getId(), r);
-				return r;
-			});
+
+		return this.redisTemplate.opsForHash().entries(REDIS_GATEWAY).map(m -> {
+
+			RouteDefinition r = new Gson().fromJson(m.getValue().toString(), RouteDefinition.class);
+			routes.put(r.getId(), r);
+			return r;
 
 		}).then();
+
 	}
 
 	private Mono<Void> redisSave(String key, RouteDefinition value) {
 
-		return this.redisTemplate.hasKey(key).flatMap(r -> {
+		return this.redisTemplate.opsForHash().hasKey(REDIS_GATEWAY, key).flatMap(r -> {
 			if (r == true) {
 				return Mono.empty();
 			} else {
-				return this.redisTemplate.opsForValue().set(key, new Gson().toJson(value));
-			}
+//				return this.redisTemplate.opsForValue().set(key, new Gson().toJson(value));
 
-//			return this.redisTemplate.opsForValue().set(key, new Gson().toJson(value));
-		})
-//				.switchIfEmpty(Mono.error(new RedisSystemException("Cannot rename key that does not exist",
-//				new RedisException("ERR no such key."))))
-				.switchIfEmpty(Mono.defer(() -> {
-					log.debug(key + " route is exist!");
-					return Mono.empty();
-				})).then();
+				return this.redisTemplate.opsForHash().put(REDIS_GATEWAY, key, new Gson().toJson(value));
+			}
+		}).switchIfEmpty(Mono.defer(() -> {
+			log.debug(key + " route is exist!");
+			return Mono.empty();
+		}))
+//		.switchIfEmpty(Mono.error(new RedisSystemException("Cannot rename key that does not exist",
+//		new RedisException("ERR no such key."))))
+				.then();
+
 	}
 
 	/**
