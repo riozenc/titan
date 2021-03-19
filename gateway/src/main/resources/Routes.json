@@ -238,5 +238,25 @@
 		],
 		"uri": "lb://FMS-EIS-SERVER/",
 		"order": 0
+	},{
+		"id": "task",
+		"predicates": [
+			{
+				"name": "Path",
+				"args": {
+					"_genkey_0": "/taskServer/**"
+				}
+			}
+		],
+		"filters": [
+			{
+				"name": "Pre",
+				"args": {
+					
+				}
+			}
+		],
+		"uri": "lb://TASK-REPORT/",
+		"order": 0
 	}
 ]

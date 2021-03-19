@@ -14,7 +14,7 @@ eureka:
     prefer-ip-address: true
   client:
     serviceUrl:
-      #defaultZone: http://enn:df6100@127.0.0.1:7777/eureka/
+      #defaultZone: http://enn:df6100@172.21.29.55:7777/enn/eureka/
       defaultZone: http://titan:df6100@10.39.68.27:6150/eureka/
 logging:
   level:
